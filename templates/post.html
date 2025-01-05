@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block pageTitle %}{{ metadata.title }}{% endblock %}
+{% block pageDesc %}{{ metadata.description }}{% endblock %}
+{% block pageKeys %}{{ super() }},{{ metadata.tags }}{% endblock %}
+{% block pageTime %}1 Day{% endblock %}
+{% block pageAuthor %}{{ metadata.author }}{% endblock %}
+{% block pageImg %}{{ metadata.image.url }}{% endblock %}
+{% block pageImgW %}{{ metadata.image.width }}{% endblock %}
+{% block pageImgH %}{{ metadata.image.height }}{% endblock %}
+{% block pageImgA %}{{ metadata.image.alt }}{% endblock %}
+{% block head %}
+	{{ super() }}
+	<script type="application/ld+json">
+	{
+		"@context": "http://schema.org/",
+		"@type": "BlogPosting",
+		"encodingFormat": [
+			"text/html",
+			"text/css",
+			"text/javascript",
+			"image/webp"
+		],
+		"inLanguage": "en-us",
+		"license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+		"publisher": {
+			"@type": "Organization",
+			"name": "Compressed Thoughts",
+			"logo": {
+				"@type": "ImageObject",
+				"encodingFormat": "image/webp",
+				"url": "https://blog.matthewrease.net/icon.webp",
+				"width": "548",
+				"height": "548"
+			}
+		},
+		"mainEntityOfPage": "https://blog.matthewrease.net/{{ metadata.canonical }}",
+		"keywords": "{{ metadata.tags }}",
+		"image": [
+			"{{ metadata.image.url }}"
+		],
+		"headline": "{{ metadata.title }}",
+		"author": {
+			"@type": "Person",
+			"name": "{{ metadata.author }}"
+		},
+		"description": "{{ metadata.description | replace('"', '\\"') }}",
+		"articleBody": "{{ metadata.preview | replace('"', '\\"') }}",
+		"datePublished": "{{ metadata.published.date }}T{{ metadata.published.time }}-08:00",
+		"dateModified": "{{ metadata.modified.date }}T{{ metadata.modified.time }}-08:00"
+	}
+	</script>
+{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="w3-col l8 s12">
+		<main id="blogPost">
+			<div class="w3-card-4 w3-margin w3-white">
+				<article>
+					<img id="postImage" src="{{ metadata.image.url }}" alt="{{ metadata.image.alt }}" style="width:100%" />
+					<div class="w3-container">
+						<h2><span><strong id="postTitle">{{ metadata.title }}</strong></span>{% if metadata.author != 'Matthew Rease' %}<span class="w3-medium">, by <a href="/author/NOTIMPLEMENTED">{{ metadata.author }}</a></span>{% endif %}</h2>
+						<!--<div class="w3-container">-->
+							<p id="postDescription">{{ metadata.description }}</p>
+						<!--</div>-->
+					</div>
+
+					<div class="w3-container">
+						{{ metadata.preview }}
+						<br />
+						{{ metadata.content | safe }}
+						{% if metadata.author != 'Matthew Rease' %}
+						<br />
+						<p>This post was contributed by another author, and its views may not entirely reflect those of mine. For more information click the authors name at the top of the page.</p>
+						{% endif %}
+					</div>
+				</article>
+			</div>
+
+			<div class="w3-container w3-padding-32 w3-margin-top">
+				<a href="/" style="display:inline" class="w3-button w3-deep-purple w3-padding-large">Return <i class="fas fas-reply"></i></a>
+			</div>
+		</main>
+	</div>
+{% endblock %}

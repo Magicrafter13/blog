@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#" lang="en">
+	<head>
+	{% block head %}
+		<!--<meta http-equiv="Content-Security-Policy" content="
+			default-src 'none';
+			base-uri blog.matthewrease.net;
+			child-src 'none';
+			connect-src blog.matthewrease.net ka-f.fontawesome.com/releases/;
+			font-src fonts.gstatic.com ka-f.fontawesome.com/releases/;
+			form-action blog.matthewrease.net;
+			frame-src 'none';
+			img-src 'self' cdn.matthewrease.net;
+			media-src 'none';
+			object-src 'none';
+			script-src 'self' 'unsafe-inline' cdn.matthewrease.net kit.fontawesome.com/b30914b072.js;
+			style-src 'self' 'unsafe-inline' www.w3schools.com/w3css/ ka-f.fontawesome.com/releases/ fonts.googleapis.com
+		" />-->
+		<meta charset="utf-8" />
+		<base href="/{{ metadata.base }}" />
+		<link rel="canonical" href="https://blog.matthewrease.net/{{ metadata.canonical }}" />
+		<meta property="og:url" content="https://blog.matthewrease.net/{{ metadata.canonical }}" />
+
+		<title>Compressed Thoughts</title>
+		<meta name="title" content="{% if title in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
+		<meta property="og:title" content="{% if title in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
+
+		<meta property="og:type" content="{% block pageType %}article{% endblock %}" />
+		<meta name="description" content="{% if description in metadata %}{{ metadata.description }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
+		<meta property="og:description" content="{% if description in metadata %}{{ metadata.description }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
+		<meta name="keywords" content="{% block pageKeys %}matthew, rease, old, forge, inn, tofi, compressed, thoughts, blog, post, tech, technology, personal, life, blogging{% endblock %}" />
+		<meta name="revisit-after" content="{% block pageTime %}8 Hours{% endblock %}" />
+
+		<meta property="og:site_name" content="Compressed Thoughts" />
+		<meta name="author" content="{% block pageAuthor %}Matthew Rease{% endblock %}" />
+		<meta name="designer" content="Matthew Rease" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="copyright" content="Copyright &copy; {{ year }} Matthew Rease" />
+		<meta name="language" content="English" />
+		<meta name="robots" content="index, follow" />
+		<meta name="googlebot" content="index, follow" />
+		<meta name="bingbot" content="index, follow" />
+
+		<meta property="og:image" content="{% block pageImg %}https://blog.matthewrease.net/icon.webp{% endblock %}" />
+		<meta property="og:image:type" content="image/webp" />
+		<meta property="og:image:width" content="{% block pageImgW %}548{% endblock %}" />
+		<meta property="og:image:height" content="{% block pageImgH %}548{% endblock %}" />
+		<meta property="og:image:alt" content="{% block pageImgA %}Blog Icon{% endblock %}" />
+
+		<link rel="shortcut icon" type="image/x-icon" href="icon.webp" />
+		<link rel="preload" as="style" href="https://www.w3schools.com/w3css/4/w3.css" onload="this.onload=null;this.rel='stylesheet'" />
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+		<!--<link rel="preload" as="style" href="/style/blog.css" onload="this.onload=null;this.rel='stylesheet'" />
+		<link rel="stylesheet" href="/style/blog.css" />-->
+		<link rel="preload" as="style" href="https://blog.matthewrease.net/style/blog.css" onload="this.onload=null;this.rel='stylesheet'" />
+		<link rel="stylesheet" href="https://blog.matthewrease.net/style/blog.css" />
+		<link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Raleway" onload="this.onload=null;this.rel='stylesheet'" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" />
+
+		<script defer src="https://kit.fontawesome.com/b30914b072.js"
+		integrity="sha384-JADOYKRr+MePSso2xDJGEWtXwflVrwAZdUCl9tDvakynWQnnu/GsJV06tL33Vy56"
+		crossorigin="anonymous"
+		data-auto-add-css="false"></script>
+		<link re="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://ka-f.fontawesome.com/releases/v5.15.2/css/free.min.css?token=b30914b072" />
+		<link rel="stylesheet" href="https://ka-f.fontawesome.com/releases/v5.15.2/css/free.min.css?token=b30914b072" />
+	{% endblock %}
+	</head>
+	<body class="w3-dark-grey">
+		<div class="w3-content" style="max-width: 1400px">
+			<header class="w3-container w3-center w3-padding-32">
+				<h1><strong>Compressed Thoughts</strong></h1>
+				<p>A blog by <span class="w3-tag">Matthew Rease</span></p>
+			</header>
+			<div class="w3-row">
+				{% block body %}{% endblock %}
+
+				<div class="w3-col l4" id="sidebar">
+					<div class="w3-card w3-margin w3-margin-top" id="about">
+						<img src="https://cdn.matthewrease.net/images/me_young.jp2" alt="My Mom holding my arm, while I (a child) am trying to pet a bear cub at the zoo." style="width:100%">
+						<div class="w3-container w3-white">
+							<h2><strong>Matthew Rease</strong></h2>
+							<p>Bedroom programmer, all-day nerd. I've been programming since I was in middle school, and I've always liked to entertain people, so I hope that will come across in my posts. If you want to learn more about me, see <a href="https://matthewrease.net/about/"><strong>my profile</strong></a>.</p>
+						</div>
+					</div>
+					<hr>
+
+					<div class="w3-card w3-margin" id="popular">
+						<div class="w3-container w3-padding"><h2>Popular Posts</h2></div>
+						<ul class="w3-ul w3-hoverable w3-white">
+						{% for post in metadata.popular %}
+							<li class="w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
+								<a href="/post/{{ post.id }}" style="text-decoration:none">
+									<span class="w3-padding-16" style="display:block">
+										<img data-src="{{ post.image }}" alt="{{ post.image_alt }}" class="lazyload w3-left w3-margin-right" style="width: 50px" />
+										<span class="w3-large">{{ post.title }}</span>
+										<br />
+										<span>{{ post.description }}</span>
+									</span>
+								</a>
+							</li>
+						{% endfor %}
+						</ul>
+					</div>
+					<hr>
+
+					<div class="w3-card w3-margin" id="archive">
+						<div class="w3-container w3-padding"><h2>Archive</h2></div>
+						<ul class="w3-ul w3-hoverable w3-white">
+						<!--{!% for post in metadata.archive.years %!}
+						{!% endfor %!}
+				<?php
+				foreach (array_reverse(glob(__DIR__ . "/posts/archive/*", GLOB_ONLYDIR)) as $year) {
+				?>
+							<li class="w3-padding-16 w3-button w3-block w3-white w3-left-align" onclick="archive('<?php echo pathinfo($year)['filename']; ?>')">
+								<span class="w3-large"><?php echo pathinfo($year)['filename']; ?></span>
+							</li>
+							<li class="w3-hide w3-white" id="<?php echo pathinfo($year)['filename']; ?>">
+				<?php
+					foreach(array_reverse(glob($year . "/*", GLOB_ONLYDIR)) as $month) {
+				?>
+								<ul class="w3-ul w3-hoverable w3-white">
+									<li class="w3-button w3-block w3-white w3-left-align" onclick="archive('<?php echo pathinfo($year)['filename'] . pathinfo($month)['filename']; ?>')">
+										<span class="w3-large">
+				<?php
+						$months = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+						$m = pathinfo($month)['filename'];
+						echo $m > 0 && $m < 13 ? $months[(int)$m - 1] : 'ERROR';
+				?>
+										</span>
+									</li>
+									<ul class="w3-ul w3-hoverable w3-white w3-hide" id="<?php echo pathinfo($year)['filename'] . pathinfo($month)['filename']; ?>">
+				<?php
+						foreach(array_reverse(glob($month . "/*.post")) as $post) {
+							$postID = pathinfo($year)['filename'] . pathinfo($month)['filename'] . pathinfo($post)['filename'];
+
+							$doc = new DOMDocument();
+							$doc->validateOnParse = true;
+							$doc->loadHTML(file_get_contents($post));
+				?>
+										<a href="/post/<?php echo $postID; ?>" style="text-decoration:none">
+											<li class="w3-padding-16 w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
+												<img data-src="/posts/images/archive/<?php echo pathinfo($year)['filename'] . '/' . pathinfo($month)['filename'] . '/' . pathinfo($post)['filename']; ?>.webp" alt="<?php echo $doc->getElementById('image')->getAttribute('alt'); ?>" class="lazyload w3-left w3-margin-right" style="width:50px" />
+												<span class="w3-large"><?php echo $doc->getElementById('title')->textContent; ?></span>
+												<br />
+												<span><?php echo $doc->getElementById('description')->textContent; ?></span>
+											</li>
+										</a>
+				<?php
+						}
+				?>
+									</ul>
+								</ul>
+				<?php
+					}
+				?>
+							</li>
+				<?php
+				}
+				?>-->
+							Temporarily not implemented.
+						</ul>
+						<script>function archive(e){var a=document.getElementById(e);-1==a.className.indexOf("w3-show")?a.className+=" w3-show":a.className=a.className.replace(" w3-show","")}</script>
+					</div>
+					<hr>
+
+					<div class="w3-card w3-margin" id="tags">
+						<div class="w3-container w3-padding">
+							<h2>Tags</h2>
+						</div>
+						<div class="w3-container w3-white">
+						{% for tag in metadata.tags %}
+							<a class="w3-button w3-tag {% if metadata.filter == tag %}w3-black{% else %}w3-dark-grey{% endif %} w3-margin-top w3-margin-bottom" href="{% if tag == '' %}./{% else %}filter/{{ tag }}{% endif %}">{% if tag == '' %}All Posts{% else %}{{ tag.title() }}{% endif %}</a>
+						{% endfor %}
+							<br />
+							<input id="search" type="text" class="w3-input w3-border w3-light-gray" placeholder="Search your own tag" onkeypress="if (window.event.keyCode == '13') search()" />
+							<script>function search(){var b=document.createElement('a');b.href='filter/'+document.getElementById('search').value;b.click();}</script>
+							<br />
+						</div>
+					</div>
+					<!--<hr >-->
+
+					<!--<div class="w3-card w3-margin w3-hide" id="ads">
+						<div class="w3-container w3-padding">
+							<h2>$upport ;)</h2>
+						</div>
+						<div class="w3-container w3-white w3-button w3-cell-row">
+							<div class="w3-cell">
+								<span class="w3-panel"><a href="http://onemboaran.com/afu.php?zoneid=3073204">Ad</a></span>
+							</div>
+						</div>
+					</div>-->
+				</div>
+			</div>
+			<br />
+		</div>
+
+		<footer class="w3-container w3-dark-grey w3-padding-32 w3-margin-top">
+			<a href="https://matthewrease.net/" class="w3-button w3-deep-orange w3-padding-large w3-margin-bottom">Return to the Inn</a>
+			<!-- PAGINATION <form action="/" method="GET" style="display: inline">
+				<input type="hidden" name="filter" value="<?php echo $filter; ?>" />
+				<?php if ($haveP[0]) { ?>
+				<a class="w3-button w3-black w3-padding-large w3-margin-bottom" href="page/<?php echo $pages[0] . ($filter != '' ? '/filter/' . $filter : ''); ?>">Previous <i class="fas fa-angle-double-left"></i></a>
+				<?php } else { ?>
+				<span class="w3-button w3-black w3-disabled w3-padding-large w3-margin-bottom">Previous <i class="fas fa-angle-double-left"></i></span>
+				<?php } if ($haveP[1] && $run > 3) { ?>
+				<a class="w3-button w3-black w3-padding-large w3-margin-bottom" href="page/<?php echo $pages[1] . ($filter != '' ? '/filter/' . $filter : ''); ?>">Next <i class="fas fa-angle-double-right"></i></a>
+				<?php } else { ?>
+				<span class="w3-button w3-black w3-disabled w3-padding-large w3-margin-bottom">Next <i class="fas fa-angle-double-right"></i></span>
+<?php } ?>
+			</form>-->
+			<p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank" rel="noopener">w3.css</a></p>
+		</footer>
+
+		<script src="https://cdn.matthewrease.net/scripts/lazysizes.min.js" async></script>
+	</body>
+</html>
