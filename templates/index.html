@@ -6,20 +6,20 @@
 	{% for post in metadata.posts %}
 		<article id="post{{ post.id }}">
 			<div class="w3-card-4 w3-margin w3-white">
-				<img data-src="/posts/images<?php echo $path; ?>.webp" alt="<?php echo $doc->getElementById('image')->getAttribute('alt'); ?>" class="lazyload" style="width: 100%" />
+				<img data-src="{{ post.image }}" alt="{{ post.image_alt }}" class="lazyload" style="width: 100%" />
 				<div class="w3-container">
-					<h3><strong><?php echo $doc->getElementById('title')->textContent; ?></strong><?php if ($postAuthor != '') echo '<span class="w3-medium">, by ' . $postAuthor . '</span>'; ?></h3>
-					<h5><?php echo $postDesc; ?>, <span class="w3-opacity"><?php echo $doc->getElementById('date')->textContent; ?></span></h5>
+					<h3><strong>{{ post.title }}</strong>{% if post.author != 'Matthew Rease' %}<span class="w3-medium">, by {{ post.author }}</span>{% endif %}</h3>
+					<h5>{{ post.description }}, <span class="w3-opacity">{{ post.datestr }}</span></h5>
 				</div>
 
 				<div class="w3-container">
-					<?php echo $postPreview; ?>
+					{{ post.preview }}
 					<div class="w3-row">
 						<div class="w3-col m8 s12">
-							<p><a href="/post/<?php echo $postID; ?>" class="w3-button w3-padding-large w3-white w3-border"><strong>READ MORE <i class="fas fa-file-alt w3-xlarge"></i></strong></a></p>
+							<p><a href="/post/{{ post.id }}" class="w3-button w3-padding-large w3-white w3-border"><strong>READ MORE <i class="fas fa-file-alt w3-xlarge"></i></strong></a></p>
 						</div>
 						<div class="w3-col m4 w3-hide-small">
-							<p><span class="w3-padding-large w3-right"><strong>Comments   </strong> <span class="fa-stack"><i class="fas fa-stack-2x fa-comment-alt"></i><span class="fa-stack-1x disqus-comment-count" data-disqus-url="https://blog.matthewrease.net/post/<?php echo $postID ?>" data-disqus-identifier="post-<?php echo $postID ?>" style="color:white;top:-3px">#</span></span></span></p>
+							<p><span class="w3-padding-large w3-right"><strong>Comments   </strong> <span class="fa-stack"><i class="fas fa-stack-2x fa-comment-alt"></i><span class="fa-stack-1x disqus-comment-count" data-disqus-url="https://blog.matthewrease.net/post/{{ post.id }}" data-disqus-identifier="post-{{ post.id }}" style="color:white;top:-3px">#</span></span></span></p>
 						</div>
 					</div>
 				</div>
@@ -103,7 +103,7 @@
 							"image": {
 								"@type": "ImageObject",
 								"encodingFormat": "image/webp",
-								"url": "{{ post.image.url }}"
+								"url": "{{ post.image }}"
 							},
 							"datePublished": "{{ post.published.date }}T{{ post.published.time }}-08:00",
 							"dateModified": "{{ post.modified.date }}T{{ post.modified.time }}-08:00",

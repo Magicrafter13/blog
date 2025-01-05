@@ -70,8 +70,53 @@ context = DBContextManager()
 @app.route('/filter/<tag_filter>')
 def index(tag_filter=None):
     """Generate main page, showing most recent posts (paginated)."""
-    if tag_filter:
-        print(f'GOT FILTER {tag_filter}')
+    if not tag_filter:
+        tag_filter = ''
+    top_tags = [row[0] for row in context.execute("""
+        SELECT Tag.name, COUNT(DISTINCT PostTag.post_id) AS post_count
+        FROM PostTag
+        JOIN Tag on PostTag.tag_id = Tag.tag_id
+        GROUP BY Tag.name
+        ORDER BY post_count DESC
+        LIMIT 15""",
+        tuple())]
+    if tag_filter in top_tags:
+        top_tags.remove(tag_filter)
+        top_tags.insert(0, tag_filter)
+
+    query = f"""
+        SELECT User.name, Post.title, Post.description, Post.preview, Post.published, Post.modified, Post.filename, Post.image
+        FROM Post
+        JOIN User ON Post.user_id = User.user_id {'''
+        WHERE Post.post_id IN (
+            SELECT PostTag.post_id
+            FROM PostTag
+            JOIN Tag ON Tag.tag_id = PostTag.tag_id
+            WHERE Tag.name = %s)''' if tag_filter != '' else ''}
+        ORDER BY filename DESC
+        LIMIT 5;"""
+
+    posts = [
+        {
+            'id': row[6],
+            'image': f'https://blog.matthewrease.net/posts/images/archive/{row[6][0:4]}/{row[6][4:6]}/{row[6][6:]}.webp',
+            'image_alt': row[7],
+            'title': row[1],
+            'description': row[2],
+            'preview': row[3],
+            'author': row[0],
+            'published': {
+                'date': row[4].strftime('%Y%m%d'),
+                'time': row[4].strftime('%H%M%S'),
+            },
+            'modified': {
+                'date': row[5].strftime('%Y%m%d'),
+                'time': row[5].strftime('%H%M%S'),
+            },
+            'datestr': row[4].strftime('%b %d, %Y')
+        }
+        for row in context.execute(query, (tag_filter,) if tag_filter != '' else None)]
+
     metadata = {
         'base': '',
         'canonical': '',
@@ -98,12 +143,9 @@ def index(tag_filter=None):
                 'description': 'Ha, what kind of idiot would start a blog, then go over a month without posting... heh... yeah what kind?'
             }
         ],
-        'tags': [
-            '',
-            'programming'
-        ],
-        'filter': '',
-        'posts': []
+        'tags': [''] + top_tags,
+        'filter': tag_filter,
+        'posts': posts
     }
     return render_template('index.html', metadata=metadata)
     #return '<html><body>Hello World</body></html>'
