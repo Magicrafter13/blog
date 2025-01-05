@@ -1,6 +1,4 @@
 {% extends "base.html" %}
-{% block pageTitle %}{{ metadata.title }}{% endblock %}
-{% block pageDesc %}{{ metadata.description }}{% endblock %}
 {% block pageKeys %}{{ super() }},{{ metadata.tags }}{% endblock %}
 {% block pageTime %}1 Day{% endblock %}
 {% block pageAuthor %}{{ metadata.author }}{% endblock %}
@@ -43,8 +41,8 @@
 			"@type": "Person",
 			"name": "{{ metadata.author }}"
 		},
-		"description": "{{ metadata.description | replace('"', '\\"') }}",
-		"articleBody": "{{ metadata.preview | replace('"', '\\"') }}",
+		"description": "{{ metadata.description | striptags | replace('"', '\\"') }}",
+		"articleBody": "{{ metadata.preview | striptags | replace('"', '\\"') }}",
 		"datePublished": "{{ metadata.published.date }}T{{ metadata.published.time }}-08:00",
 		"dateModified": "{{ metadata.modified.date }}T{{ metadata.modified.time }}-08:00"
 	}
@@ -60,12 +58,12 @@
 					<div class="w3-container">
 						<h2><span><strong id="postTitle">{{ metadata.title }}</strong></span>{% if metadata.author != 'Matthew Rease' %}<span class="w3-medium">, by <a href="/author/NOTIMPLEMENTED">{{ metadata.author }}</a></span>{% endif %}</h2>
 						<!--<div class="w3-container">-->
-							<p id="postDescription">{{ metadata.description }}</p>
+							<p id="postDescription">{{ metadata.description | safe }}</p>
 						<!--</div>-->
 					</div>
 
 					<div class="w3-container">
-						{{ metadata.preview }}
+						{{ metadata.preview | safe }}
 						<br />
 						{{ metadata.content | safe }}
 						{% if metadata.author != 'Matthew Rease' %}

@@ -2,6 +2,7 @@
 """Compressed Thoughts blog, by Matthew Rease."""
 
 import threading
+from datetime import datetime
 from os import environ
 
 import markdown
@@ -61,6 +62,27 @@ class DBContextManager:
         self.cursor.close()
         self.db.close()
 
+def generate_archive_dict(posts):
+    """Split flat dictionary of posts into one sorted by year and then month."""
+    res = {}
+    for year in range(datetime.now().year, 2019, -1):
+        year = str(year)
+        y_posts = {}
+        for month in range(1, 13):
+            month = str(month).zfill(2)
+            m_posts = {
+                _id[6:]: post
+                for _id, post in posts.items()
+                if _id[0:4] == year and _id[4:6] == month }
+            #for _id, post in posts.items():
+            #    if _id[0:4] == year and _id[4:6] == month:
+            #        y_posts[month][_id[6:]] = post
+            if m_posts:
+                y_posts[month] = m_posts
+        if y_posts:
+            res[year] = y_posts
+    return res
+
 # For Flask
 app = Flask(__name__)
 context = DBContextManager()
@@ -96,10 +118,10 @@ def index(tag_filter=None):
         ORDER BY filename DESC
         LIMIT 5;"""
 
-    posts = [
+    main_posts = [
         {
             'id': row[6],
-            'image': f'https://blog.matthewrease.net/posts/images/archive/{row[6][0:4]}/{row[6][4:6]}/{row[6][6:]}.webp',
+            'image': f'https://cdn.matthewrease.net/blog/{row[6]}.webp',
             'image_alt': row[7],
             'title': row[1],
             'description': row[2],
@@ -117,41 +139,50 @@ def index(tag_filter=None):
         }
         for row in context.execute(query, (tag_filter,) if tag_filter != '' else None)]
 
+    all_posts = {
+        row[2]: { 'title': row[0], 'description': row[1], 'alt': row[3] }
+        for row in context.execute(
+            'SELECT title, description, filename, image FROM Post ORDER BY filename DESC',
+            tuple())}
+
+    popular_posts = [ '202002101957', '202002261145', '202004161413' ]
     metadata = {
         'base': '',
         'canonical': '',
         'popular': [
             {
-                'id': 202002101957,
-                'image': 'https://blog.matthewrease.net/posts/images/archive/2020/02/101957.webp',
-                'image_alt': 'html code on a green crt display',
-                'title': 'Old Code',
-                'description': 'Ever look at your old code, and think: what the actual ****?'
-            },
-            {
-                'id': 202002261145,
-                'image': 'https://blog.matthewrease.net/posts/images/archive/2020/02/261145.webp',
-                'image_alt': 'a cluttered attic with cardboard boxes, among other things',
-                'title': 'The Attic of Unfinished Projects',
-                'description': "It makes me kinda sad to think about all the projects I've started that are \"on the backburner\", \"unfinished\", or otherwise in some form of purgatory."
-            },
-            {
-                'id': 202004161413,
-                'image': 'https://blog.matthewrease.net/posts/images/archive/2020/04/161413.webp',
-                'image_alt': "coronavirus image that definitely wasn't just the first image search result :)",
-                'title': 'Coronavirus am I right?',
-                'description': 'Ha, what kind of idiot would start a blog, then go over a month without posting... heh... yeah what kind?'
+                'id': id,
+                'image': f'https://cdn.matthewrease.net/blog/{id}.webp',
+                'image_alt': all_posts[id]['alt'],
+                'title': all_posts[id]['title'],
+                'description': all_posts[id]['description']
             }
-        ],
+            for id in popular_posts],
         'tags': [''] + top_tags,
         'filter': tag_filter,
-        'posts': posts
+        'archive': generate_archive_dict(all_posts),
+        'month_names': {
+            '01': 'January',
+            '02': 'February',
+            '03': 'March',
+            '04': 'April',
+            '05': 'May',
+            '06': 'June',
+            '07': 'July',
+            '08': 'August',
+            '09': 'September',
+            '10': 'October',
+            '11': 'November',
+            '12': 'December'
+        },
+        'posts': main_posts
     }
+    print(metadata['archive'])
     return render_template('index.html', metadata=metadata)
     #return '<html><body>Hello World</body></html>'
 
 @app.route('/post/<int:post_id>')
-def post(post_id):
+def show_post(post_id):
     """Show a post from the database."""
     res = context.execute(
         # pylint: disable=line-too-long
@@ -177,21 +208,21 @@ def post(post_id):
         'popular': [
             {
                 'id': 202002101957,
-                'image': 'https://blog.matthewrease.net/posts/images/archive/2020/02/101957.webp',
+                'image': 'https://cdn.matthewrease.net/blog/202002101957.webp',
                 'image_alt': 'html code on a green crt display',
                 'title': 'Old Code',
                 'description': 'Ever look at your old code, and think: what the actual ****?'
             },
             {
                 'id': 202002261145,
-                'image': 'https://blog.matthewrease.net/posts/images/archive/2020/02/261145.webp',
+                'image': 'https://cdn.matthewrease.net/blog/202002261145.webp',
                 'image_alt': 'a cluttered attic with cardboard boxes, among other things',
                 'title': 'The Attic of Unfinished Projects',
                 'description': "It makes me kinda sad to think about all the projects I've started that are \"on the backburner\", \"unfinished\", or otherwise in some form of purgatory."
             },
             {
                 'id': 202004161413,
-                'image': 'https://blog.matthewrease.net/posts/images/archive/2020/04/161413.webp',
+                'image': 'https://cdn.matthewrease.net/blog/202004161413.webp',
                 'image_alt': "coronavirus image that definitely wasn't just the first image search result :)",
                 'title': 'Coronavirus am I right?',
                 'description': 'Ha, what kind of idiot would start a blog, then go over a month without posting... heh... yeah what kind?'
@@ -203,7 +234,7 @@ def post(post_id):
         'description': res[3],
         'author': author,
         'image': {
-            'url': f'https://blog.matthewrease.net/posts/images/archive/{res[8][0:4]}/{res[8][4:6]}/{res[8][6:]}.webp',  # pylint: disable=line-too-long
+            'url': f'https://cdn.matthewrease.net/blog/{res[8]}.webp',
             'width': 64,
             'height': 64,
             'alt': res[9]

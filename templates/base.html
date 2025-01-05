@@ -26,8 +26,8 @@
 		<meta property="og:title" content="{% if title in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
 
 		<meta property="og:type" content="{% block pageType %}article{% endblock %}" />
-		<meta name="description" content="{% if description in metadata %}{{ metadata.description }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
-		<meta property="og:description" content="{% if description in metadata %}{{ metadata.description }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
+		<meta name="description" content="{% if description in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
+		<meta property="og:description" content="{% if description in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
 		<meta name="keywords" content="{% block pageKeys %}matthew, rease, old, forge, inn, tofi, compressed, thoughts, blog, post, tech, technology, personal, life, blogging{% endblock %}" />
 		<meta name="revisit-after" content="{% block pageTime %}8 Hours{% endblock %}" />
 
@@ -94,7 +94,7 @@
 										<img data-src="{{ post.image }}" alt="{{ post.image_alt }}" class="lazyload w3-left w3-margin-right" style="width: 50px" />
 										<span class="w3-large">{{ post.title }}</span>
 										<br />
-										<span>{{ post.description }}</span>
+										<span>{{ post.description | safe }}</span>
 									</span>
 								</a>
 							</li>
@@ -106,58 +106,28 @@
 					<div class="w3-card w3-margin" id="archive">
 						<div class="w3-container w3-padding"><h2>Archive</h2></div>
 						<ul class="w3-ul w3-hoverable w3-white">
-						<!--{!% for post in metadata.archive.years %!}
-						{!% endfor %!}
-				<?php
-				foreach (array_reverse(glob(__DIR__ . "/posts/archive/*", GLOB_ONLYDIR)) as $year) {
-				?>
-							<li class="w3-padding-16 w3-button w3-block w3-white w3-left-align" onclick="archive('<?php echo pathinfo($year)['filename']; ?>')">
-								<span class="w3-large"><?php echo pathinfo($year)['filename']; ?></span>
-							</li>
-							<li class="w3-hide w3-white" id="<?php echo pathinfo($year)['filename']; ?>">
-				<?php
-					foreach(array_reverse(glob($year . "/*", GLOB_ONLYDIR)) as $month) {
-				?>
+						{% for year in metadata.archive %}
+							<li class="w3-padding-16 w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}')"><span class="w3-large">{{ year }}</span></li>
+						{% for month in metadata.archive[year] %}
+							<li class="w3-hide w3-white" id="{{ year }}">
 								<ul class="w3-ul w3-hoverable w3-white">
-									<li class="w3-button w3-block w3-white w3-left-align" onclick="archive('<?php echo pathinfo($year)['filename'] . pathinfo($month)['filename']; ?>')">
-										<span class="w3-large">
-				<?php
-						$months = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
-						$m = pathinfo($month)['filename'];
-						echo $m > 0 && $m < 13 ? $months[(int)$m - 1] : 'ERROR';
-				?>
-										</span>
-									</li>
-									<ul class="w3-ul w3-hoverable w3-white w3-hide" id="<?php echo pathinfo($year)['filename'] . pathinfo($month)['filename']; ?>">
-				<?php
-						foreach(array_reverse(glob($month . "/*.post")) as $post) {
-							$postID = pathinfo($year)['filename'] . pathinfo($month)['filename'] . pathinfo($post)['filename'];
-
-							$doc = new DOMDocument();
-							$doc->validateOnParse = true;
-							$doc->loadHTML(file_get_contents($post));
-				?>
-										<a href="/post/<?php echo $postID; ?>" style="text-decoration:none">
+									<li class="w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}{{ month }}')"><span class="w3-large">{{ metadata.month_names[month] }}</span></li>
+									<ul class="w3-ul w3-hoverable w3-white w3-hide" id="{{ year }}{{ month }}">
+									{% for short_id in metadata.archive[year][month] %}
+										<a href="/post/{{ year }}{{ month }}{{ short_id }}" style="text-decoration:none">
 											<li class="w3-padding-16 w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
-												<img data-src="/posts/images/archive/<?php echo pathinfo($year)['filename'] . '/' . pathinfo($month)['filename'] . '/' . pathinfo($post)['filename']; ?>.webp" alt="<?php echo $doc->getElementById('image')->getAttribute('alt'); ?>" class="lazyload w3-left w3-margin-right" style="width:50px" />
-												<span class="w3-large"><?php echo $doc->getElementById('title')->textContent; ?></span>
+												<img data-src="https://cdn.matthewrease.net/blog/{{ year }}{{ month }}{{ short_id }}.webp" alt="{{ metadata.archive[year][month][short_id]['alt'] }}" class="lazyload w3-left w3-margin-right" style="width:50px" />
+												<span class="w3-large">{{ metadata.archive[year][month][short_id]['title'] }}</span>
 												<br />
-												<span><?php echo $doc->getElementById('description')->textContent; ?></span>
+												<span>{{ metadata.archive[year][month][short_id]['description'] | safe }}</span>
 											</li>
 										</a>
-				<?php
-						}
-				?>
+									{% endfor %}
 									</ul>
 								</ul>
-				<?php
-					}
-				?>
 							</li>
-				<?php
-				}
-				?>-->
-							Temporarily not implemented.
+						{% endfor %}
+						{% endfor %}
 						</ul>
 						<script>function archive(e){var a=document.getElementById(e);-1==a.className.indexOf("w3-show")?a.className+=" w3-show":a.className=a.className.replace(" w3-show","")}</script>
 					</div>

@@ -9,11 +9,11 @@
 				<img data-src="{{ post.image }}" alt="{{ post.image_alt }}" class="lazyload" style="width: 100%" />
 				<div class="w3-container">
 					<h3><strong>{{ post.title }}</strong>{% if post.author != 'Matthew Rease' %}<span class="w3-medium">, by {{ post.author }}</span>{% endif %}</h3>
-					<h5>{{ post.description }}, <span class="w3-opacity">{{ post.datestr }}</span></h5>
+					<h5>{{ post.description | safe }}, <span class="w3-opacity">{{ post.datestr }}</span></h5>
 				</div>
 
 				<div class="w3-container">
-					{{ post.preview }}
+					{{ post.preview | safe }}
 					<div class="w3-row">
 						<div class="w3-col m8 s12">
 							<p><a href="/post/{{ post.id }}" class="w3-button w3-padding-large w3-white w3-border"><strong>READ MORE <i class="fas fa-file-alt w3-xlarge"></i></strong></a></p>
@@ -42,7 +42,7 @@
 	{% else %}
 		<article id="noposts">
 			<div class="w3-card-4 w3-margin w3-white">
-				<img src="https://blog.matthewrease.net/posts/images/noposts.webp" alt="tumbleweed in the wilderness" class="w3-image" style="width:100%" />
+				<img src="https://cdn.matthewrease.net/blog/noposts.webp" alt="tumbleweed in the wilderness" class="w3-image" style="width:100%" />
 				<div class="w3-container">
 					<h3><strong>Oh...</strong></h3>
 					<h5>There doesn't appear to be anything here.</h5>
@@ -94,8 +94,8 @@
 							"@type": "BlogPosting",
 							"mainEntityOfPage": "https://blog.matthewrease.net/post/{{ post.id }}",
 							"headline": "{{ post.title }}",
-							"description": "{{ post.description | replace('"', '&#34;') }}",
-							"articleBody": "{{ post.preview | replace('"', '&#34;') }}",
+							"description": "{{ post.description | striptags | replace('"', '&#34;') }}",
+							"articleBody": "{{ post.preview | striptags | replace('"', '&#34;') }}",
 							"author": {
 								"@type": "Person",
 								"name": "{{ post.author }}"
