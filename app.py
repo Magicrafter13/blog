@@ -9,6 +9,7 @@ import markdown
 import MySQLdb
 from dotenv import load_dotenv
 from flask import Flask, render_template
+from PIL import Image
 
 TWO_HOUR_DELTA = timedelta(hours = 2)
 
@@ -301,6 +302,8 @@ def show_post(post_id):
 
         all_posts = context.get_all_posts_sidebar()
 
+        image = Image.open(f'static/{res[8]}.webp')
+
         popular_posts = [ '202002101957', '202002261145', '202004161413' ]
         metadata = {
             'base': '',
@@ -336,8 +339,8 @@ def show_post(post_id):
             'author': author,
             'image': {
                 'url': f'/static/{res[8]}.webp',
-                'width': 64,
-                'height': 64,
+                'width': image.size[0],
+                'height': image.size[1],
                 'alt': res[9]
             },
             'preview': res[4],
