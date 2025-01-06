@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block body %}
+	{{ super() }}
+	<div class="w3-col l8 s12">
+		<div class="w3-card-4 w3-margin w3-white">
+			<div class="w3-container">
+				<h2><strong>HTTP 500 - Could not connect to the database!</strong></h2>
+			</div>
+			<div class="w3-container">
+				<p>Please try again later, or contact the administrator if you're able.</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}

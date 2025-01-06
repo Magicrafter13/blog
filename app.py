@@ -34,13 +34,11 @@ class DBContextManager:
     """Simple way to track database connection and variables."""
 
     def __init__(self):
-        """Connect to database using environment variables."""
+        """Create persistent Blog MySQL database connection and establish cache."""
         load_dotenv()
-        self.db = MySQLdb.connect(
-            user=environ.get('MYSQL_USER'),
-            password=environ.get('MYSQL_PASSWORD'),
-            database=environ.get('MYSQL_DATABASE'))
-        self.cursor = self.db.cursor()
+        self.db = None
+        self.cursor = None
+        self.connect()
         self.lock = threading.Lock()
 
         _2ha = datetime.now() - TWO_HOUR_DELTA
@@ -57,12 +55,27 @@ class DBContextManager:
             'post_count_req': _2ha
         }
 
+    def connect(self):
+        """Connect to database using environment variables."""
+        self.db = MySQLdb.connect(
+            user=environ.get('MYSQL_USER'),
+            password=environ.get('MYSQL_PASSWORD'),
+            database=environ.get('MYSQL_DATABASE'))
+        self.cursor = self.db.cursor()
+
     def execute(self, query, tokens):
         """Dumb wrapper for MySQLdb.cursor.execute."""
-        with self.lock:
-            print(f'\x1b[31mexecuting query {query}\x1b[0m')
-            self.cursor.execute(query, tokens)
-            return self.cursor.fetchall()
+        try:
+            with self.lock:
+                print(f'\x1b[31mexecuting query {query}\x1b[0m')
+                self.cursor.execute(query, tokens)
+                return self.cursor.fetchall()
+        except MySQLdb.OperationalError as _e:
+            if _e.args[0] == 2006:
+                print('Lost database connection, attempting reconnect.')
+                self.connect()
+                return self.execute(query, tokens)
+            raise
 
     #def fetch(self):
     #    """Dumb wrapper for MySQLdb.cursor.fetchall."""
@@ -142,6 +155,11 @@ class DBContextManager:
 app = Flask(__name__)
 context = DBContextManager()
 
+http500_db_metadata = {
+    'base': '',
+    'canonical': ''
+}
+
 # Handle Pages
 @app.route('/')
 @app.route('/filter/<tag_filter>')
@@ -149,186 +167,196 @@ context = DBContextManager()
 @app.route('/filter/<tag_filter>/page/<int:page>')
 def index(tag_filter='', page=0):
     """Generate main page, showing most recent posts (paginated)."""
-    top_tags = [tag for tag in context.get_top_tags()]
-    if tag_filter in top_tags:
-        top_tags.remove(tag_filter)
-    if tag_filter != '':
-        top_tags.insert(0, tag_filter)
-    top_tags.insert(0, '')
+    try:
+        top_tags = list(context.get_top_tags())
+        if tag_filter in top_tags:
+            top_tags.remove(tag_filter)
+        if tag_filter != '':
+            top_tags.insert(0, tag_filter)
+        top_tags.insert(0, '')
 
-    main_posts = [
-        {
-            'id': row[6],
-            'image': f'/static/{row[6]}.webp',
-            'image_alt': row[7],
-            'title': row[1],
-            'description': row[2],
-            'preview': row[3],
-            'author': row[0],
-            'published': {
-                'date': row[4].strftime('%Y%m%d'),
-                'time': row[4].strftime('%H%M%S'),
+        main_posts = [
+            {
+                'id': row[6],
+                'image': f'/static/{row[6]}.webp',
+                'image_alt': row[7],
+                'title': row[1],
+                'description': row[2],
+                'preview': row[3],
+                'author': row[0],
+                'published': {
+                    'date': row[4].strftime('%Y%m%d'),
+                    'time': row[4].strftime('%H%M%S'),
+                },
+                'modified': {
+                    'date': row[5].strftime('%Y%m%d'),
+                    'time': row[5].strftime('%H%M%S'),
+                },
+                'datestr': row[4].strftime('%b %d, %Y')
+            }
+            for row in context.execute(
+                f"""
+                SELECT User.name, Post.title, Post.description, Post.preview, Post.published, Post.modified, Post.filename, Post.image
+                FROM Post
+                JOIN User ON Post.user_id = User.user_id {'''
+                WHERE Post.post_id IN (
+                    SELECT PostTag.post_id
+                    FROM PostTag
+                    JOIN Tag ON Tag.tag_id = PostTag.tag_id
+                    WHERE LOWER(Tag.name) LIKE %s)''' if tag_filter != '' else ''}
+                ORDER BY filename DESC
+                LIMIT 5
+                OFFSET %s;""",
+                (f'%{tag_filter.lower()}%', page * 5) if tag_filter != '' else (page * 5,))]
+
+        all_posts = context.get_all_posts_sidebar()
+
+        popular_posts = [ '202002101957', '202002261145', '202004161413' ]
+        metadata = {
+            'base': '',
+            'canonical': '',
+            'popular': [
+                {
+                    'id': id,
+                    'image': f'/static/{id}.webp',
+                    'image_alt': all_posts[id]['alt'],
+                    'title': all_posts[id]['title'],
+                    'description': all_posts[id]['description']
+                }
+                for id in popular_posts],
+            'tags': top_tags,
+            'filter': tag_filter,
+            'archive': context.generate_archive_dict(),
+            'month_names': {
+                '01': 'January',
+                '02': 'February',
+                '03': 'March',
+                '04': 'April',
+                '05': 'May',
+                '06': 'June',
+                '07': 'July',
+                '08': 'August',
+                '09': 'September',
+                '10': 'October',
+                '11': 'November',
+                '12': 'December'
             },
-            'modified': {
-                'date': row[5].strftime('%Y%m%d'),
-                'time': row[5].strftime('%H%M%S'),
-            },
-            'datestr': row[4].strftime('%b %d, %Y')
-        }
-        for row in context.execute(
-            f"""
-            SELECT User.name, Post.title, Post.description, Post.preview, Post.published, Post.modified, Post.filename, Post.image
-            FROM Post
-            JOIN User ON Post.user_id = User.user_id {'''
-            WHERE Post.post_id IN (
-                SELECT PostTag.post_id
+            'page': page,
+            'last': (context.get_post_count() - 1) // 5 if tag_filter == '' else (context.execute(
+                """
+                SELECT COUNT(DISTINCT PostTag.post_id)
                 FROM PostTag
                 JOIN Tag ON Tag.tag_id = PostTag.tag_id
-                WHERE LOWER(Tag.name) LIKE %s)''' if tag_filter != '' else ''}
-            ORDER BY filename DESC
-            LIMIT 5
-            OFFSET %s;""",
-            (f'%{tag_filter.lower()}%', page * 5) if tag_filter != '' else (page * 5,))]
-
-    all_posts = context.get_all_posts_sidebar()
-
-    popular_posts = [ '202002101957', '202002261145', '202004161413' ]
-    metadata = {
-        'base': '',
-        'canonical': '',
-        'popular': [
-            {
-                'id': id,
-                'image': f'/static/{id}.webp',
-                'image_alt': all_posts[id]['alt'],
-                'title': all_posts[id]['title'],
-                'description': all_posts[id]['description']
-            }
-            for id in popular_posts],
-        'tags': top_tags,
-        'filter': tag_filter,
-        'archive': context.generate_archive_dict(),
-        'month_names': {
-            '01': 'January',
-            '02': 'February',
-            '03': 'March',
-            '04': 'April',
-            '05': 'May',
-            '06': 'June',
-            '07': 'July',
-            '08': 'August',
-            '09': 'September',
-            '10': 'October',
-            '11': 'November',
-            '12': 'December'
-        },
-        'page': page,
-        'last': (context.get_post_count() - 1) // 5 if tag_filter == '' else (context.execute(
-            """
-            SELECT COUNT(DISTINCT PostTag.post_id)
-            FROM PostTag
-            JOIN Tag ON Tag.tag_id = PostTag.tag_id
-            WHERE LOWER(Tag.name) LIKE %s;""",
-            (f'%{tag_filter.lower()}%',))[0][0] - 1) // 5,
-        'posts': main_posts
-    }
-    print(metadata['last'])
-    return render_template('index.html', metadata=metadata)
+                WHERE LOWER(Tag.name) LIKE %s;""",
+                (f'%{tag_filter.lower()}%',))[0][0] - 1) // 5,
+            'posts': main_posts
+        }
+        print(metadata['last'])
+        return render_template('index.html', metadata=metadata)
+    except MySQLdb.OperationalError as _e:
+        if _e.args[0] == 2002:
+            print('Could not connect to database!')
+            return render_template('500_db.html', metadata=http500_db_metadata), 500
+        raise
 
 @app.route('/post/<int:post_id>')
 def show_post(post_id):
     """Show a post from the database."""
-    res = context.execute(
-        # pylint: disable=line-too-long
-        """
-        SELECT post_id, user_id, title, description, preview, content, published, modified, filename, image
-        FROM Post
-        WHERE filename = %s;""",
-        (post_id,))[0]
-    md_body = markdown.markdown(res[5], extensions=["fenced_code", HeadingShiftExtension()])
+    try:
+        res = context.execute(
+            # pylint: disable=line-too-long
+            """
+            SELECT post_id, user_id, title, description, preview, content, published, modified, filename, image
+            FROM Post
+            WHERE filename = %s;""",
+            (post_id,))[0]
+        md_body = markdown.markdown(res[5], extensions=["fenced_code", HeadingShiftExtension()])
 
-    # Alternate idea to get both tags_sql and the post in one query:
-    #
-    # SELECT Post.post_id, Post.title, ..., Tag.name
-    # FROM Post
-    # LEFT JOIN PostTag ON Post.post_id = PostTag.post_id
-    # LEFT JOIN Tag ON PostTag.tag_id = Tag.tag_id
-    # WHERE Post.filename = %s;
-    #
-    # Which creates something like the table below.
-    #
-    # +---------+------------------------------------+--------------+
-    # | post_id | title                              | name         |
-    # +---------+------------------------------------+--------------+
-    # |      19 | Confidentiality in the Digital Age | learning     |
-    # |      19 | Confidentiality in the Digital Age | cryptography |
-    # |      19 | Confidentiality in the Digital Age | privacy      |
-    # +---------+------------------------------------+--------------+
+        # Alternate idea to get both tags_sql and the post in one query:
+        #
+        # SELECT Post.post_id, Post.title, ..., Tag.name
+        # FROM Post
+        # LEFT JOIN PostTag ON Post.post_id = PostTag.post_id
+        # LEFT JOIN Tag ON PostTag.tag_id = Tag.tag_id
+        # WHERE Post.filename = %s;
+        #
+        # Which creates something like the table below.
+        #
+        # +---------+------------------------------------+--------------+
+        # | post_id | title                              | name         |
+        # +---------+------------------------------------+--------------+
+        # |      19 | Confidentiality in the Digital Age | learning     |
+        # |      19 | Confidentiality in the Digital Age | cryptography |
+        # |      19 | Confidentiality in the Digital Age | privacy      |
+        # +---------+------------------------------------+--------------+
 
-    tags_sql = context.execute(f"""
-        SELECT Tag.name
-        FROM PostTag
-        JOIN Tag ON PostTag.tag_id = Tag.tag_id
-        WHERE PostTag.post_id = {res[0]};""",  # Not explicitly optimized
-        tuple())                               # Should do the WHERE first...
+        tags_sql = context.execute(f"""
+            SELECT Tag.name
+            FROM PostTag
+            JOIN Tag ON PostTag.tag_id = Tag.tag_id
+            WHERE PostTag.post_id = {res[0]};""",  # Not explicitly optimized
+            tuple())                               # Should do the WHERE first...
 
-    author = context.get_user(res[1])
+        author = context.get_user(res[1])
 
-    all_posts = context.get_all_posts_sidebar()
+        all_posts = context.get_all_posts_sidebar()
 
-    popular_posts = [ '202002101957', '202002261145', '202004161413' ]
-    metadata = {
-        'base': '',
-        'canonical': f'post/{res[8]}',
-        'popular': [
-            {
-                'id': id,
-                'image': f'/static/{id}.webp',
-                'image_alt': all_posts[id]['alt'],
-                'title': all_posts[id]['title'],
-                'description': all_posts[id]['description']
-            }
-            for id in popular_posts],
-        'tags': [row[0] for row in tags_sql],
-        'filter': '',
-        'archive': context.generate_archive_dict(),
-        'month_names': {
-            '01': 'January',
-            '02': 'February',
-            '03': 'March',
-            '04': 'April',
-            '05': 'May',
-            '06': 'June',
-            '07': 'July',
-            '08': 'August',
-            '09': 'September',
-            '10': 'October',
-            '11': 'November',
-            '12': 'December'
-        },
-        'title': res[2],
-        'description': res[3],
-        'author': author,
-        'image': {
-            'url': f'/static/{res[8]}.webp',
-            'width': 64,
-            'height': 64,
-            'alt': res[9]
-        },
-        'preview': res[4],
-        'published': {
-            'date': res[6].strftime('%Y%m%d'),
-            'time': res[6].strftime('%H%M%S'),
-        },
-        'modified': {
-            'date': res[7].strftime('%Y%m%d'),
-            'time': res[7].strftime('%H%M%S'),
-        },
-        'content': md_body
-    }
-    return render_template('post.html', metadata=metadata)
-    #return f'<html><body>{md_body}</body></html>'
-    #return context.fetch()
+        popular_posts = [ '202002101957', '202002261145', '202004161413' ]
+        metadata = {
+            'base': '',
+            'canonical': f'post/{res[8]}',
+            'popular': [
+                {
+                    'id': id,
+                    'image': f'/static/{id}.webp',
+                    'image_alt': all_posts[id]['alt'],
+                    'title': all_posts[id]['title'],
+                    'description': all_posts[id]['description']
+                }
+                for id in popular_posts],
+            'tags': [row[0] for row in tags_sql],
+            'filter': '',
+            'archive': context.generate_archive_dict(),
+            'month_names': {
+                '01': 'January',
+                '02': 'February',
+                '03': 'March',
+                '04': 'April',
+                '05': 'May',
+                '06': 'June',
+                '07': 'July',
+                '08': 'August',
+                '09': 'September',
+                '10': 'October',
+                '11': 'November',
+                '12': 'December'
+            },
+            'title': res[2],
+            'description': res[3],
+            'author': author,
+            'image': {
+                'url': f'/static/{res[8]}.webp',
+                'width': 64,
+                'height': 64,
+                'alt': res[9]
+            },
+            'preview': res[4],
+            'published': {
+                'date': res[6].strftime('%Y%m%d'),
+                'time': res[6].strftime('%H%M%S'),
+            },
+            'modified': {
+                'date': res[7].strftime('%Y%m%d'),
+                'time': res[7].strftime('%H%M%S'),
+            },
+            'content': md_body
+        }
+        return render_template('post.html', metadata=metadata)
+    except MySQLdb.OperationalError as _e:
+        if _e.args[0] == 2002:
+            print('Could not connect to database!')
+            return render_template('500_db.html', metadata=http500_db_metadata), 500
+        raise
 
 # For uWSGI
 application = app
