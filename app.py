@@ -11,25 +11,9 @@ from dotenv import load_dotenv
 from flask import Flask, render_template
 from PIL import Image
 
+from md_ext import HeadingShiftExtension
+
 TWO_HOUR_DELTA = timedelta(hours = 2)
-
-class HeadingShiftProcessor(markdown.treeprocessors.Treeprocessor):  # pylint: disable=too-few-public-methods
-    """Find all <h> elements and increase their level."""
-
-    def run(self, root):
-        """Largely adapted from ChatGPT."""
-        for element in root.iter():
-            if element.tag.startswith('h') and element.tag[1:].isdigit():
-                level = int(element.tag[1:])
-                element.tag = f'h{level + 2}'
-
-class HeadingShiftExtension(markdown.extensions.Extension):
-    """Extend Markdown library with heading shifter."""
-
-    def extendMarkdown(self, md):
-        """Register extension in the Markdown engine."""
-        # Priority arbitrarily chosen by ChatGPT...
-        md.treeprocessors.register(HeadingShiftProcessor(md), 'shiftheadings', 15)
 
 class DBContextManager:
     """Simple way to track database connection and variables."""
@@ -37,10 +21,16 @@ class DBContextManager:
     def __init__(self):
         """Create persistent Blog MySQL database connection and establish cache."""
         load_dotenv()
+        self.credentials = {
+            'user': environ.get('MYSQL_USER'),
+            'password': environ.get('MYSQL_PASSWORD'),
+            'database': environ.get('MYSQL_DATABASE') }
+
         self.db = None
         self.cursor = None
-        self.connect()
         self.lock = threading.Lock()
+        self.connect()
+
 
         _2ha = datetime.now() - TWO_HOUR_DELTA
         self.cache = {
@@ -56,36 +46,32 @@ class DBContextManager:
             'post_count_req': _2ha
         }
 
-    def connect(self):
-        """Connect to database using environment variables."""
-        self.db = MySQLdb.connect(
-            user=environ.get('MYSQL_USER'),
-            password=environ.get('MYSQL_PASSWORD'),
-            database=environ.get('MYSQL_DATABASE'))
-        self.cursor = self.db.cursor()
-
-    def execute(self, query, tokens):
-        """Dumb wrapper for MySQLdb.cursor.execute."""
-        try:
-            with self.lock:
-                print(f'\x1b[31mexecuting query {query}\x1b[0m')
-                self.cursor.execute(query, tokens)
-                return self.cursor.fetchall()
-        except MySQLdb.OperationalError as _e:
-            if _e.args[0] == 2006:
-                print('Lost database connection, attempting reconnect.')
-                self.connect()
-                return self.execute(query, tokens)
-            raise
-
-    #def fetch(self):
-    #    """Dumb wrapper for MySQLdb.cursor.fetchall."""
-    #    return self.cursor.fetchall()
-
     def __del__(self):
         """Close database connections."""
         self.cursor.close()
         self.db.close()
+
+    def connect(self):
+        """Connect to database using environment variables."""
+        self.db = MySQLdb.connect(
+            user=self.credentials['user'],
+            password=self.credentials['password'],
+            database=self.credentials['database'])
+        self.cursor = self.db.cursor()
+
+    def execute(self, query: str, tokens: tuple) -> tuple:
+        """Dumb wrapper for MySQLdb.cursor.execute."""
+        try:
+            with self.lock:
+                redlog(f'executing query {query}')
+                self.cursor.execute(query, tokens)
+                return self.cursor.fetchall()
+        except MySQLdb.OperationalError as _e:
+            if _e.args[0] == 2006:
+                redlog('Lost database connection, attempting reconnect.')
+                self.connect()
+                return self.execute(query, tokens)
+            raise
 
     def get_all_posts_sidebar(self):
         """Get short-form dict of every post (with cache)."""
@@ -156,10 +142,24 @@ class DBContextManager:
 app = Flask(__name__)
 context = DBContextManager()
 
+def redlog(msg):
+    """Print red text to log (easily distinguished from Flask logging)."""
+    print(f'\x1b[31m{msg}\x1b[0m')
+
 http500_db_metadata = {
     'base': '',
     'canonical': ''
 }
+
+def get_top_tags(tag_filter):
+    """Generate list of the most used tags, including the current filter and an empty tag."""
+    top_tags = list(context.get_top_tags())
+    if tag_filter in top_tags:
+        top_tags.remove(tag_filter)
+    if tag_filter != '':
+        top_tags.insert(0, tag_filter)
+    top_tags.insert(0, '')
+    return top_tags
 
 # Handle Pages
 @app.route('/')
@@ -169,13 +169,10 @@ http500_db_metadata = {
 def index(tag_filter='', page=0):
     """Generate main page, showing most recent posts (paginated)."""
     try:
-        top_tags = list(context.get_top_tags())
-        if tag_filter in top_tags:
-            top_tags.remove(tag_filter)
-        if tag_filter != '':
-            top_tags.insert(0, tag_filter)
-        top_tags.insert(0, '')
-
+        # Prereqs for Jinja metadata.
+        all_posts = context.get_all_posts_sidebar()
+        popular_posts = [ '202002101957', '202002261145', '202004161413' ]
+        top_tags = get_top_tags(tag_filter)
         main_posts = [
             {
                 'id': row[6],
@@ -210,9 +207,7 @@ def index(tag_filter='', page=0):
                 OFFSET %s;""",
                 (f'%{tag_filter.lower()}%', page * 5) if tag_filter != '' else (page * 5,))]
 
-        all_posts = context.get_all_posts_sidebar()
-
-        popular_posts = [ '202002101957', '202002261145', '202004161413' ]
+        # All relevant data for Jinja template.
         metadata = {
             'base': '',
             'canonical': '',
@@ -252,11 +247,11 @@ def index(tag_filter='', page=0):
                 (f'%{tag_filter.lower()}%',))[0][0] - 1) // 5,
             'posts': main_posts
         }
-        print(metadata['last'])
         return render_template('index.html', metadata=metadata)
+
     except MySQLdb.OperationalError as _e:
         if _e.args[0] == 2002:
-            print('Could not connect to database!')
+            redlog('Could not connect to database!')
             return render_template('500_db.html', metadata=http500_db_metadata), 500
         raise
 
@@ -264,6 +259,7 @@ def index(tag_filter='', page=0):
 def show_post(post_id):
     """Show a post from the database."""
     try:
+        # Prereqs for Jinja metadata.
         res = context.execute(
             # pylint: disable=line-too-long
             """
@@ -271,8 +267,8 @@ def show_post(post_id):
             FROM Post
             WHERE filename = %s;""",
             (post_id,))[0]
-        md_body = markdown.markdown(res[5], extensions=["fenced_code", HeadingShiftExtension()])
-
+        all_posts = context.get_all_posts_sidebar()
+        popular_posts = [ '202002101957', '202002261145', '202004161413' ]
         # Alternate idea to get both tags_sql and the post in one query:
         #
         # SELECT Post.post_id, Post.title, ..., Tag.name
@@ -290,21 +286,17 @@ def show_post(post_id):
         # |      19 | Confidentiality in the Digital Age | cryptography |
         # |      19 | Confidentiality in the Digital Age | privacy      |
         # +---------+------------------------------------+--------------+
-
         tags_sql = context.execute(f"""
             SELECT Tag.name
             FROM PostTag
             JOIN Tag ON PostTag.tag_id = Tag.tag_id
             WHERE PostTag.post_id = {res[0]};""",  # Not explicitly optimized
             tuple())                               # Should do the WHERE first...
-
         author = context.get_user(res[1])
-
-        all_posts = context.get_all_posts_sidebar()
-
         image = Image.open(f'static/{res[8]}.webp')
+        md_body = markdown.markdown(res[5], extensions=["fenced_code", HeadingShiftExtension()])
 
-        popular_posts = [ '202002101957', '202002261145', '202004161413' ]
+        # All relevant data for Jinja template.
         metadata = {
             'base': '',
             'canonical': f'post/{res[8]}',
@@ -355,9 +347,10 @@ def show_post(post_id):
             'content': md_body
         }
         return render_template('post.html', metadata=metadata)
+
     except MySQLdb.OperationalError as _e:
         if _e.args[0] == 2002:
-            print('Could not connect to database!')
+            redlog('Could not connect to database!')
             return render_template('500_db.html', metadata=http500_db_metadata), 500
         raise
 

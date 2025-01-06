@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html prefix="og: http://ogp.me/ns#" lang="en">
+<html prefix="og: http://ogp.me/ns/article#" lang="en">
 	<head>
 	{% block head %}
 		<!--<meta http-equiv="Content-Security-Policy" content="
@@ -19,33 +19,36 @@
 		<meta charset="utf-8" />
 		<base href="/{{ metadata.base }}" />
 		<link rel="canonical" href="https://blog.matthewrease.net/{{ metadata.canonical }}" />
-		<meta property="og:url" content="https://blog.matthewrease.net/{{ metadata.canonical }}" />
 
 		<title>Compressed Thoughts</title>
-		<meta name="title" content="{% if 'title' in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
-		<meta property="og:title" content="{% if 'title' in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
 
-		<meta property="og:type" content="{% block pageType %}article{% endblock %}" />
+		<meta name="title" content="{% if 'title' in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
 		<meta name="description" content="{% if 'description' in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
-		<meta property="og:description" content="{% if 'description' in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
 		<meta name="keywords" content="{% block pageKeys %}matthew, rease, old, forge, inn, tofi, compressed, thoughts, blog, post, tech, technology, personal, life, blogging{% endblock %}" />
 		<meta name="revisit-after" content="{% block pageTime %}8 Hours{% endblock %}" />
-
-		<meta property="og:site_name" content="Compressed Thoughts" />
 		<meta name="author" content="{% block pageAuthor %}Matthew Rease{% endblock %}" />
 		<meta name="designer" content="Matthew Rease" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="copyright" content="Copyright &copy; {{ year }} Matthew Rease" />
 		<meta name="language" content="English" />
-		<meta name="robots" content="index, follow" />
-		<meta name="googlebot" content="index, follow" />
-		<meta name="bingbot" content="index, follow" />
 
-		<meta property="og:image" content="{% block pageImg %}/static/icon.webp{% endblock %}" />
+		<!-- Required OpenGraph Tags -->
+		<meta property="og:title" content="{% if 'title' in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
+		<meta property="og:type" content="article" />
+		<meta property="og:image" content="https://blog.matthewrease.net{% block pageImg %}/static/icon.webp{% endblock %}" />
 		<meta property="og:image:type" content="image/webp" />
 		<meta property="og:image:width" content="{% block pageImgW %}548{% endblock %}" />
 		<meta property="og:image:height" content="{% block pageImgH %}548{% endblock %}" />
 		<meta property="og:image:alt" content="{% block pageImgA %}Blog Icon{% endblock %}" />
+		<meta property="og:url" content="https://blog.matthewrease.net/{{ metadata.canonical }}" />
+
+		<!-- Optional OpenGraph Tags -->
+		<meta property="og:description" content="{% if 'description' in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
+		<meta property="og:site_name" content="Compressed Thoughts" />
+
+		<meta name="robots" content="index, follow" />
+		<meta name="googlebot" content="index, follow" />
+		<meta name="bingbot" content="index, follow" />
 
 		<link rel="shortcut icon" type="image/x-icon" href="/static/icon.webp" />
 		<link rel="preload" as="style" href="https://www.w3schools.com/w3css/4/w3.css" onload="this.onload=null;this.rel='stylesheet'" />

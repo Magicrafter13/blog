@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block pageKeys %}{{ super() }},{{ metadata.tags }}{% endblock %}
+{% block pageKeys %}{{ super() }}, {{ ', '.join(metadata.tags) }}{% endblock %}
 {% block pageTime %}1 Day{% endblock %}
 {% block pageAuthor %}{{ metadata.author }}{% endblock %}
 {% block pageImg %}{{ metadata.image.url }}{% endblock %}
@@ -8,6 +8,12 @@
 {% block pageImgA %}{{ metadata.image.alt }}{% endblock %}
 {% block head %}
 	{{ super() }}
+
+	<meta property="og:article:published_time" content="{{ metadata.published.date }}T{{ metadata.published.time }}-08:00" />
+	<meta property="og:article:modified_time" content="{{ metadata.modified.date }}T{{ metadata.modified.time }}-08:00" />
+	<meta property="og:article:author" content="{{ metadata.author }}" />
+	<meta property="og:article:tag" content="{{ ','.join(metadata.tags) }}" />
+
 	<script type="application/ld+json">
 	{
 		"@context": "http://schema.org/",
@@ -33,9 +39,12 @@
 		},
 		"mainEntityOfPage": "https://blog.matthewrease.net/{{ metadata.canonical }}",
 		"keywords": "{{ ', '.join(metadata.tags) }}",
-		"image": [
-			"{{ metadata.image.url }}"
-		],
+		"image": {
+        "@type": "ImageObject",
+        "url": "{{ metadata.image.url }}",
+				"width": {{ metadata.image.url.width }},
+				"height": {{ metadata.image.url.height }}
+    },
 		"headline": "{{ metadata.title | replace('"', '\\"') | safe }}",
 		"author": {
 			"@type": "Person",
