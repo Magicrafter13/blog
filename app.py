@@ -289,7 +289,7 @@ def show_post(post_id):
                 'description': all_posts[id]['description']
             }
             for id in popular_posts],
-        'tags': [''] + [row[0] for row in tags_sql],
+        'tags': [row[0] for row in tags_sql],
         'filter': '',
         'archive': context.generate_archive_dict(),
         'month_names': {

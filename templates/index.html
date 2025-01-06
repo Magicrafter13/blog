@@ -102,9 +102,9 @@
 						{
 							"@type": "BlogPosting",
 							"mainEntityOfPage": "https://blog.matthewrease.net/post/{{ post.id }}",
-							"headline": "{{ post.title }}",
-							"description": "{{ post.description | striptags | replace('"', '&#34;') }}",
-							"articleBody": "{{ post.preview | striptags | replace('"', '&#34;') }}",
+							"headline": "{{ post.title | replace('"', '\\"') | safe }}",
+							"description": "{{ post.description | striptags | replace('"', '\\"') | safe }}",
+							"articleBody": "{{ post.preview | striptags | replace('"', '\\"') | safe }}",
 							"author": {
 								"@type": "Person",
 								"name": "{{ post.author }}"

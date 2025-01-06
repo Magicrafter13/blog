@@ -32,17 +32,17 @@
 			}
 		},
 		"mainEntityOfPage": "https://blog.matthewrease.net/{{ metadata.canonical }}",
-		"keywords": "{{ metadata.tags }}",
+		"keywords": "{{ ', '.join(metadata.tags) }}",
 		"image": [
 			"{{ metadata.image.url }}"
 		],
-		"headline": "{{ metadata.title }}",
+		"headline": "{{ metadata.title | replace('"', '\\"') | safe }}",
 		"author": {
 			"@type": "Person",
 			"name": "{{ metadata.author }}"
 		},
-		"description": "{{ metadata.description | striptags | replace('"', '\\"') }}",
-		"articleBody": "{{ metadata.preview | striptags | replace('"', '\\"') }}",
+		"description": "{{ metadata.description | striptags | replace('"', '\\"') | safe }}",
+		"articleBody": "{{ metadata.preview | striptags | replace('"', '\\"') | safe }}",
 		"datePublished": "{{ metadata.published.date }}T{{ metadata.published.time }}-08:00",
 		"dateModified": "{{ metadata.modified.date }}T{{ metadata.modified.time }}-08:00"
 	}
