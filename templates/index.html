@@ -38,7 +38,7 @@
 	{% if metadata.filter != '' or metadata.page > metadata.last %}
 		<article id="badArgs">
 			<div class="w3-card-4 w3-margin w3-white">
-				<img src="https://cdn.matthewrease.net/blog/badArgs.webp" alt="empty filing cabinet" class="w3-image" style="width:100%" />
+				<img src="/static/badArgs.webp" alt="empty filing cabinet" class="w3-image" style="width:100%" />
 				<div class="w3-container">
 					<h3><strong>Bad Filter/Page</strong></h3>
 					<h5>The requested filter or page came up empty, please try something else.</h5>
@@ -51,15 +51,14 @@
 	{% else %}
 		<article id="noposts">
 			<div class="w3-card-4 w3-margin w3-white">
-				<img src="https://cdn.matthewrease.net/blog/noposts.webp" alt="tumbleweed in the wilderness" class="w3-image" style="width:100%" />
+				<img src="/static/noposts.webp" alt="tumbleweed in the wilderness" class="w3-image" style="width:100%" />
 				<div class="w3-container">
 					<h3><strong>Oh...</strong></h3>
 					<h5>There doesn't appear to be anything here.</h5>
 				</div>
 				<div class="w3-container">
-					<p>Most likely, I haven't made any posts between now, and the start of the previous month. To see older posts, please check the archive in the sidebar (below this message on small screens). Unfortunately I can get pretty busy at times, or run out of ideas - after all, I'm not some company with several writers!</p>
+					<p>There don't seem to be any posts on this blog - perhaps the database got deleted?</p>
 				</div>
-				This snippet likely cannot appear ever again...
 			</div>
 		</article>
 	{% endif %}

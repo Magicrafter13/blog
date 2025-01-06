@@ -116,7 +116,7 @@
 									{% for short_id in metadata.archive[year][month] %}
 										<a href="/post/{{ year }}{{ month }}{{ short_id }}" style="text-decoration:none">
 											<li class="w3-padding-16 w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
-												<img data-src="https://cdn.matthewrease.net/blog/{{ year }}{{ month }}{{ short_id }}.webp" alt="{{ metadata.archive[year][month][short_id]['alt'] }}" class="lazyload w3-left w3-margin-right" style="width:50px" />
+												<img data-src="/static/{{ year }}{{ month }}{{ short_id }}.webp" alt="{{ metadata.archive[year][month][short_id]['alt'] }}" class="lazyload w3-left w3-margin-right" style="width:50px" />
 												<span class="w3-large">{{ metadata.archive[year][month][short_id]['title'] }}</span>
 												<br />
 												<span>{{ metadata.archive[year][month][short_id]['description'] | safe }}</span>

@@ -159,7 +159,7 @@ def index(tag_filter='', page=0):
     main_posts = [
         {
             'id': row[6],
-            'image': f'https://cdn.matthewrease.net/blog/{row[6]}.webp',
+            'image': f'/static/{row[6]}.webp',
             'image_alt': row[7],
             'title': row[1],
             'description': row[2],
@@ -199,7 +199,7 @@ def index(tag_filter='', page=0):
         'popular': [
             {
                 'id': id,
-                'image': f'https://cdn.matthewrease.net/blog/{id}.webp',
+                'image': f'/static/{id}.webp',
                 'image_alt': all_posts[id]['alt'],
                 'title': all_posts[id]['title'],
                 'description': all_posts[id]['description']
@@ -283,7 +283,7 @@ def show_post(post_id):
         'popular': [
             {
                 'id': id,
-                'image': f'https://cdn.matthewrease.net/blog/{id}.webp',
+                'image': f'/static/{id}.webp',
                 'image_alt': all_posts[id]['alt'],
                 'title': all_posts[id]['title'],
                 'description': all_posts[id]['description']
@@ -310,7 +310,7 @@ def show_post(post_id):
         'description': res[3],
         'author': author,
         'image': {
-            'url': f'https://cdn.matthewrease.net/blog/{res[8]}.webp',
+            'url': f'/static/{res[8]}.webp',
             'width': 64,
             'height': 64,
             'alt': res[9]
