@@ -1,4 +1,13 @@
 {% extends "base.html" %}
+{% if metadata.filter != '' and metadata.last != 0 %}
+{% block pagination %}
+<form action="/" method="GET" style="display: inline">
+	<input type="hidden" name="filter" value="{{ metadata.filter }}" />
+	<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page - 1 }}{% endif %}">Previous <i class="fas fa-angle-double-left"></i></a>
+	<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page + 1 }}{% endif %}">Next <i class="fas fa-angle-double-right"></i></a>
+</form>
+{% endblock %}
+{% endif %}
 {% block body %}
 {{ super() }}
 <div class="w3-col l8 s12" id="posts">
@@ -6,7 +15,7 @@
 	{% for post in metadata.posts %}
 		<article id="post{{ post.id }}">
 			<div class="w3-card-4 w3-margin w3-white">
-				<img data-src="{{ post.image }}" alt="{{ post.image_alt }}" class="lazyload" style="width: 100%" />
+				<img src="{{ post.image }}" alt="{{ post.image_alt }}" style="width: 100%" />
 				<div class="w3-container">
 					<h3><strong>{{ post.title }}</strong>{% if post.author != 'Matthew Rease' %}<span class="w3-medium">, by {{ post.author }}</span>{% endif %}</h3>
 					<h5>{{ post.description | safe }}, <span class="w3-opacity">{{ post.datestr }}</span></h5>
@@ -26,7 +35,7 @@
 			</div>
 		</article>
 	{% else %}
-	{% if metadata.filter != '' %}
+	{% if metadata.filter != '' or metadata.page > metadata.last %}
 		<article id="badArgs">
 			<div class="w3-card-4 w3-margin w3-white">
 				<img src="https://cdn.matthewrease.net/blog/badArgs.webp" alt="empty filing cabinet" class="w3-image" style="width:100%" />

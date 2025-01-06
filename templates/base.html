@@ -91,7 +91,7 @@
 							<li class="w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
 								<a href="/post/{{ post.id }}" style="text-decoration:none">
 									<span class="w3-padding-16" style="display:block">
-										<img data-src="{{ post.image }}" alt="{{ post.image_alt }}" class="lazyload w3-left w3-margin-right" style="width: 50px" />
+										<img src="{{ post.image }}" alt="{{ post.image_alt }}" class="w3-left w3-margin-right" style="width: 50px" />
 										<span class="w3-large">{{ post.title }}</span>
 										<br />
 										<span>{{ post.description | safe }}</span>
@@ -166,18 +166,7 @@
 
 		<footer class="w3-container w3-dark-grey w3-padding-32 w3-margin-top">
 			<a href="https://matthewrease.net/" class="w3-button w3-deep-orange w3-padding-large w3-margin-bottom">Return to the Inn</a>
-			<!-- PAGINATION <form action="/" method="GET" style="display: inline">
-				<input type="hidden" name="filter" value="<?php echo $filter; ?>" />
-				<?php if ($haveP[0]) { ?>
-				<a class="w3-button w3-black w3-padding-large w3-margin-bottom" href="page/<?php echo $pages[0] . ($filter != '' ? '/filter/' . $filter : ''); ?>">Previous <i class="fas fa-angle-double-left"></i></a>
-				<?php } else { ?>
-				<span class="w3-button w3-black w3-disabled w3-padding-large w3-margin-bottom">Previous <i class="fas fa-angle-double-left"></i></span>
-				<?php } if ($haveP[1] && $run > 3) { ?>
-				<a class="w3-button w3-black w3-padding-large w3-margin-bottom" href="page/<?php echo $pages[1] . ($filter != '' ? '/filter/' . $filter : ''); ?>">Next <i class="fas fa-angle-double-right"></i></a>
-				<?php } else { ?>
-				<span class="w3-button w3-black w3-disabled w3-padding-large w3-margin-bottom">Next <i class="fas fa-angle-double-right"></i></span>
-<?php } ?>
-			</form>-->
+			{% block pagination %}{% endblock %}
 			<p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank" rel="noopener">w3.css</a></p>
 		</footer>
 
