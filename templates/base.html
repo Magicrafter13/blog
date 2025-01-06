@@ -22,12 +22,12 @@
 		<meta property="og:url" content="https://blog.matthewrease.net/{{ metadata.canonical }}" />
 
 		<title>Compressed Thoughts</title>
-		<meta name="title" content="{% if title in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
-		<meta property="og:title" content="{% if title in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
+		<meta name="title" content="{% if 'title' in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
+		<meta property="og:title" content="{% if 'title' in metadata %}{{ metadata.title }}{% else %}Compressed Thoughts{% endif %}" />
 
 		<meta property="og:type" content="{% block pageType %}article{% endblock %}" />
-		<meta name="description" content="{% if description in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
-		<meta property="og:description" content="{% if description in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
+		<meta name="description" content="{% if 'description' in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
+		<meta property="og:description" content="{% if 'description' in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
 		<meta name="keywords" content="{% block pageKeys %}matthew, rease, old, forge, inn, tofi, compressed, thoughts, blog, post, tech, technology, personal, life, blogging{% endblock %}" />
 		<meta name="revisit-after" content="{% block pageTime %}8 Hours{% endblock %}" />
 
