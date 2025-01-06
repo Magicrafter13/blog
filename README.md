@@ -9,7 +9,15 @@ applications are made. Also I can show this to a job recruiter. :)
 See the sister project `blog-posts` under this same user account (not linked
 for... reasons).
 
-# Production vs Testing?
+# Running This App
+## Needed Libraries
+Package names according to PyPI:
+- Markdown
+- mysqlclient
+- dotenv
+- Flask
+- pillow
+## Production vs Testing?
 My test environment isn't too dissimilar from the real one, I just use 'blog'
 for all 3 .env variables. The main difference is how I run it (technically). On
 my Arch laptop I run:
