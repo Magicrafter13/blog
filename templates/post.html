@@ -63,11 +63,11 @@
 		"mainEntityOfPage": "https://blog.matthewrease.net/{{ metadata.canonical }}",
 		"keywords": "{{ ', '.join(metadata.tags) }}",
 		"image": {
-        "@type": "ImageObject",
-        "url": "{{ metadata.image.url }}",
+				"@type": "ImageObject",
+				"url": "{{ metadata.image.url }}",
 				"width": {{ metadata.image.url.width }},
 				"height": {{ metadata.image.url.height }}
-    },
+		},
 		"headline": "{{ metadata.title | replace('"', '\\"') | safe }}",
 		"author": {
 			"@type": "Person",
