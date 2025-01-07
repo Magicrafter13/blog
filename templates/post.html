@@ -33,9 +33,7 @@
 	<meta name="twitter:description" content="{{ metadata.description | striptags }}" />
 	<meta name="twitter:image" content="https://blog.matthewrease.net{{ metadata.image.url }}" />
 {% endblock %}
-{% block head %}
-	{{ super() }}
-
+{% block json %}
 	<!-- JSON LD -->
 	<script type="application/ld+json">
 	{

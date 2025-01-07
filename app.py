@@ -150,6 +150,55 @@ http500_db_metadata = {
     'base': '',
     'canonical': ''
 }
+http404_post_metadata = {
+    'base': '',
+    'canonical': 'post/',
+    #'popular': [
+    #    {
+    #        'id': id,
+    #        'image': f'/static/{id}.webp',
+    #        'image_alt': all_posts[id]['alt'],
+    #        'title': all_posts[id]['title'],
+    #        'description': all_posts[id]['description']
+    #    }
+    #    for id in popular_posts],
+    #'tags': [row[0] for row in tags_sql],
+    'filter': '',
+    #'archive': context.generate_archive_dict(),
+    #'month_names': {
+    #    '01': 'January',
+    #    '02': 'February',
+    #    '03': 'March',
+    #    '04': 'April',
+    #    '05': 'May',
+    #    '06': 'June',
+    #    '07': 'July',
+    #    '08': 'August',
+    #    '09': 'September',
+    #    '10': 'October',
+    #    '11': 'November',
+    #    '12': 'December'
+    #},
+    'title': 'Uh Oh!',
+    'description': 'Did you mistype the link?',
+    'author': 'Matthew Rease',
+    'image': {
+        'url': f'/static/badID.webp',
+        'width': 1280,
+        'height': 800,
+        'alt': 'macintosh computer with frown and X for eyes'
+    },
+    'preview': 'Unfortunately the post ID you have provided in the URL could not be found. Please check the URL and try again.',  # pylint: disable=line-too-long
+    'published': {
+        'date': '20200202',
+        'time': '00:00:00'
+    },
+    'modified': {
+        'date': '20200202',
+        'time': '00:00:00'
+    },
+    'content': markdown.markdown('If you think this is an error, then feel free to contact me about it.')  # pylint: disable=line-too-long
+}
 
 def get_top_tags(tag_filter):
     """Generate list of the most used tags, including the current filter and an empty tag."""
@@ -266,7 +315,10 @@ def show_post(post_id):
             SELECT post_id, user_id, title, description, preview, content, published, modified, filename, image
             FROM Post
             WHERE filename = %s;""",
-            (post_id,))[0]
+            (post_id,))
+        if not res:  # Post does not exist
+            return render_template('404_post.html', metadata=http404_post_metadata), 404
+        res = res[0]
         all_posts = context.get_all_posts_sidebar()
         popular_posts = [ '202002101957', '202002261145', '202004161413' ]
         # Alternate idea to get both tags_sql and the post in one query:
