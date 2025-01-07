@@ -1,4 +1,21 @@
 {% extends "base.html" %}
+
+{% block embed %}
+	<!-- Required OpenGraph Tags -->
+	<meta property="og:title" content="Compressed Thoughts" />
+	<meta property="og:type" content="article" />
+	<meta property="og:image" content="https://blog.matthewrease.net/static/icon.webp" />
+	<meta property="og:image:type" content="image/webp" />
+	<meta property="og:image:width" content="548" />
+	<meta property="og:image:height" content="548" />
+	<meta property="og:image:alt" content="Silhouette of a human head between a vise clamp." />
+	<meta property="og:url" content="https://blog.matthewrease.net/{{ metadata.canonical }}" />
+
+	<!-- Optional OpenGraph Tags -->
+	<meta property="og:description" content="{% if 'description' in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
+	<meta property="og:site_name" content="Compressed Thoughts" />
+{% endblock %}
+
 {% if metadata.filter != '' and metadata.last != 0 %}
 {% block pagination %}
 <form action="/" method="GET" style="display: inline">
@@ -8,6 +25,7 @@
 </form>
 {% endblock %}
 {% endif %}
+
 {% block body %}
 {{ super() }}
 <div class="w3-col l8 s12" id="posts">
