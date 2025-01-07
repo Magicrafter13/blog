@@ -2,7 +2,8 @@
 <html prefix="og: http://ogp.me/ns/article#" lang="en">
 	<head>
 	{% block head %}
-		<!--<meta http-equiv="Content-Security-Policy" content="
+		{% if metadata.csp %}
+		<meta http-equiv="Content-Security-Policy" content="
 			default-src 'none';
 			base-uri blog.matthewrease.net;
 			child-src 'none';
@@ -15,7 +16,8 @@
 			object-src 'none';
 			script-src 'self' 'unsafe-inline' cdn.matthewrease.net kit.fontawesome.com/b30914b072.js;
 			style-src 'self' 'unsafe-inline' www.w3schools.com/w3css/ ka-f.fontawesome.com/releases/ fonts.googleapis.com
-		" />-->
+		" />
+		{% endif %}
 		<meta charset="utf-8" />
 		<base href="/{{ metadata.base }}" />
 		<link rel="canonical" href="https://blog.matthewrease.net/{{ metadata.canonical }}" />

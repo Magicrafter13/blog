@@ -17,6 +17,12 @@ Package names according to PyPI:
 - dotenv
 - Flask
 - pillow
+## Environment Variables
+Create a .env file, or manually set the following environment variables:
+- `MYSQL_USER`: authenticating username
+- `MYSQL_PASSWORD`: authenticating password
+- `MYSQL_DATABASE`: the database on `localhost` to use
+- `USE_CSP`: either `true` or `false` depending on whether you want to enable Content Security Policy
 ## Production vs Testing?
 My test environment isn't too dissimilar from the real one, I just use 'blog'
 for all 3 .env variables. The main difference is how I run it (technically). On

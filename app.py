@@ -13,6 +13,8 @@ from PIL import Image
 
 from md_ext import HeadingShiftExtension
 
+load_dotenv()
+
 TWO_HOUR_DELTA = timedelta(hours = 2)
 
 class DBContextManager:
@@ -20,7 +22,6 @@ class DBContextManager:
 
     def __init__(self):
         """Create persistent Blog MySQL database connection and establish cache."""
-        load_dotenv()
         self.credentials = {
             'user': environ.get('MYSQL_USER'),
             'password': environ.get('MYSQL_PASSWORD'),
@@ -146,11 +147,14 @@ def redlog(msg):
     """Print red text to log (easily distinguished from Flask logging)."""
     print(f'\x1b[31m{msg}\x1b[0m')
 
+use_csp = environ.get('USE_CSP').lower() == 'true'
 http500_db_metadata = {
+    'csp': use_csp,
     'base': '',
     'canonical': ''
 }
 http404_post_metadata = {
+    'csp' : use_csp,
     'base': '',
     'canonical': 'post/',
     #'popular': [
@@ -258,6 +262,7 @@ def index(tag_filter='', page=0):
 
         # All relevant data for Jinja template.
         metadata = {
+            'csp': use_csp,
             'base': '',
             'canonical': '',
             'popular': [
@@ -350,6 +355,7 @@ def show_post(post_id):
 
         # All relevant data for Jinja template.
         metadata = {
+            'csp': use_csp,
             'base': '',
             'canonical': f'post/{res[8]}',
             'popular': [
