@@ -59,6 +59,7 @@ class DBContextManager:
             password=self.credentials['password'],
             database=self.credentials['database'])
         self.cursor = self.db.cursor()
+        self.cursor.execute('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;')
 
     def execute(self, query: str, tokens: tuple) -> tuple:
         """Dumb wrapper for MySQLdb.cursor.execute."""
