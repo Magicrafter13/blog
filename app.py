@@ -450,5 +450,21 @@ def rss():
     }
     return Response(render_template('feed.rss', metadata=metadata), mimetype='application/rss+xml')
 
+@app.route('/sitemap.xml')
+def sitemap():
+    """Generate RSS feed of blog posts."""
+    posts = sorted(
+        [
+            {
+                'id': id,
+                'modified': post['modified'].astimezone().replace(microsecond=0).isoformat()
+            }
+            for id, post in context.get_all_posts_sidebar().items()
+        ],
+        key=lambda x: x['id'],
+        reverse=True)
+
+    return Response(render_template('sitemap.xml', posts=posts), mimetype='application/xml')
+
 # For uWSGI
 application = app
