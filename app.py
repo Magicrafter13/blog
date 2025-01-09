@@ -441,8 +441,8 @@ def rss():
         reverse=True)
 
     metadata = {
-        'now': datetime.now().strftime('%a, %d %h %Y %H:%M:%S -0800'),
-        'published': posts[0]['raw_published'].strftime('%a, %d %h %Y %H:%M:%S -0800'),
+        'now': datetime.now().astimezone().strftime('%a, %d %h %Y %H:%M:%S %z'),
+        'published': posts[0]['raw_published'].astimezone().strftime('%a, %d %h %Y %H:%M:%S %z'),
         'image': {
             'url': '/static/icon.webp'
         },
