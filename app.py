@@ -8,7 +8,7 @@ from os import environ
 import markdown
 import MySQLdb
 from dotenv import load_dotenv
-from flask import Flask, render_template
+from flask import Flask, render_template, Response
 from PIL import Image
 
 from md_ext import HeadingShiftExtension
@@ -80,9 +80,15 @@ class DBContextManager:
         if now - self.cache['all_posts_req'] > TWO_HOUR_DELTA:
             self.cache['all_posts_req'] = now
             self.cache['all_posts'] = {
-                row[2]: { 'title': row[0], 'description': row[1], 'alt': row[3] }
+                row[2]: {
+                    'title': row[0],
+                    'description': row[1],
+                    'alt': row[3],
+                    'published': row[4],
+                    'modified': row[5]
+                }
                 for row in self.execute(
-                    'SELECT title, description, filename, image FROM Post ORDER BY filename DESC',
+                    'SELECT title, description, filename, image, published, modified FROM Post ORDER BY filename DESC',  # pylint: disable=line-too-long
                     tuple())}
         return self.cache['all_posts']
 
@@ -99,9 +105,6 @@ class DBContextManager:
                     _id[6:]: post
                     for _id, post in posts.items()
                     if _id[0:4] == year and _id[4:6] == month }
-                #for _id, post in posts.items():
-                #    if _id[0:4] == year and _id[4:6] == month:
-                #        y_posts[month][_id[6:]] = post
                 if m_posts:
                     y_posts[month] = m_posts
             if y_posts:
@@ -187,7 +190,7 @@ http404_post_metadata = {
     'description': 'Did you mistype the link?',
     'author': 'Matthew Rease',
     'image': {
-        'url': f'/static/badID.webp',
+        'url': '/static/badID.webp',
         'width': 1280,
         'height': 800,
         'alt': 'macintosh computer with frown and X for eyes'
@@ -411,6 +414,40 @@ def show_post(post_id):
             redlog('Could not connect to database!')
             return render_template('500_db.html', metadata=http500_db_metadata), 500
         raise
+
+@app.route('/rss')
+def rss():
+    """Generate RSS feed of blog posts."""
+    posts = sorted(
+        [
+            {
+                'title': post['title'],
+                'id': id,
+                'description': post['description'],
+                'image': {
+                    'url': f'/static/{id}.webp',
+                    'size': 0
+                },
+                'published': post['published'].astimezone().replace(microsecond=0).isoformat(),
+                'modified': post['modified'].astimezone().replace(microsecond=0).isoformat(),
+                'raw_published': post['published'],
+                'author': 'NOT SPECIFIED',
+                'tags': []
+            }
+            for id, post in context.get_all_posts_sidebar().items()
+        ],
+        key=lambda x: x['id'],
+        reverse=True)
+
+    metadata = {
+        'now': datetime.now().strftime('%a, %d %h %Y %H:%M:%S -0800'),
+        'published': posts[0]['raw_published'].strftime('%a, %d %h %Y %H:%M:%S -0800'),
+        'image': {
+            'url': '/static/icon.webp'
+        },
+        'posts': posts
+    }
+    return Response(render_template('feed.rss', metadata=metadata), mimetype='application/rss+xml')
 
 # For uWSGI
 application = app
