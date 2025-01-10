@@ -239,14 +239,8 @@ def index(tag_filter='', page=0):
                 'description': row[2],
                 'preview': row[3],
                 'author': row[0],
-                'published': {
-                    'date': row[4].strftime('%Y%m%d'),
-                    'time': row[4].strftime('%H%M%S'),
-                },
-                'modified': {
-                    'date': row[5].strftime('%Y%m%d'),
-                    'time': row[5].strftime('%H%M%S'),
-                },
+                'published': row[4].astimezone().replace(microsecond=0).isoformat(),
+                'modified': row[5].astimezone().replace(microsecond=0).isoformat(),
                 'datestr': row[4].strftime('%b %d, %Y')
             }
             for row in context.execute(
@@ -398,14 +392,8 @@ def show_post(post_id):
                 'alt': res[9]
             },
             'preview': res[4],
-            'published': {
-                'date': res[6].strftime('%Y%m%d'),
-                'time': res[6].strftime('%H%M%S'),
-            },
-            'modified': {
-                'date': res[7].strftime('%Y%m%d'),
-                'time': res[7].strftime('%H%M%S'),
-            },
+            'published': res[6].astimezone().replace(microsecond=0).isoformat(),
+            'modified': res[7].astimezone().replace(microsecond=0).isoformat(),
             'content': md_body
         }
         return render_template('post.html', metadata=metadata)

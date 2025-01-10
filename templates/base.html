@@ -71,92 +71,100 @@
 			<div class="w3-row">
 				{% block body %}{% endblock %}
 
-				<div class="w3-col l4" id="sidebar">
-					<div class="w3-card w3-margin w3-margin-top" id="about">
-						<img src="https://cdn.matthewrease.net/images/me_young.jp2" alt="My Mom holding my arm, while I (a child) am trying to pet a bear cub at the zoo." style="width:100%">
-						<div class="w3-container w3-white">
-							<h2><strong>Matthew Rease</strong></h2>
-							<p>Bedroom programmer, all-day nerd. I've been programming since I was in middle school, and I've always liked to entertain people, so I hope that will come across in my posts. If you want to learn more about me, see <a href="https://matthewrease.net/about/"><strong>my profile</strong></a>.</p>
-						</div>
-					</div>
-					<hr>
-
-					<div class="w3-card w3-margin" id="popular">
-						<div class="w3-container w3-padding"><h2>Popular Posts</h2></div>
-						<ul class="w3-ul w3-hoverable w3-white">
-						{% for post in metadata.popular %}
-							<li class="w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
-								<a href="/post/{{ post.id }}" style="text-decoration:none">
-									<span class="w3-padding-16" style="display:block">
-										<img src="{{ post.image }}" alt="{{ post.image_alt }}" class="w3-left w3-margin-right" style="width: 50px" />
-										<span class="w3-large">{{ post.title }}</span>
-										<br />
-										<span>{{ post.description | safe }}</span>
-									</span>
-								</a>
-							</li>
-						{% endfor %}
-						</ul>
-					</div>
-					<hr>
-
-					<div class="w3-card w3-margin" id="archive">
-						<div class="w3-container w3-padding"><h2>Archive</h2></div>
-						<ul class="w3-ul w3-hoverable w3-white">
-						{% for year in metadata.archive %}
-							<li class="w3-padding-16 w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}')"><span class="w3-large">{{ year }}</span></li>
-						{% for month in metadata.archive[year] %}
-							<li class="w3-hide w3-white" id="{{ year }}">
-								<ul class="w3-ul w3-hoverable w3-white">
-									<li class="w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}{{ month }}')"><span class="w3-large">{{ metadata.month_names[month] }}</span></li>
-									<ul class="w3-ul w3-hoverable w3-white w3-hide" id="{{ year }}{{ month }}">
-									{% for short_id in metadata.archive[year][month] %}
-										<a href="/post/{{ year }}{{ month }}{{ short_id }}" style="text-decoration:none">
-											<li class="w3-padding-16 w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
-												<img data-src="/static/{{ year }}{{ month }}{{ short_id }}.webp" alt="{{ metadata.archive[year][month][short_id]['alt'] }}" class="lazyload w3-left w3-margin-right" style="width:50px" />
-												<span class="w3-large">{{ metadata.archive[year][month][short_id]['title'] }}</span>
-												<br />
-												<span>{{ metadata.archive[year][month][short_id]['description'] | safe }}</span>
-											</li>
-										</a>
-									{% endfor %}
-									</ul>
-								</ul>
-							</li>
-						{% endfor %}
-						{% endfor %}
-						</ul>
-						<script>function archive(e){var a=document.getElementById(e);-1==a.className.indexOf("w3-show")?a.className+=" w3-show":a.className=a.className.replace(" w3-show","")}</script>
-					</div>
-					<hr>
-
-					<div class="w3-card w3-margin" id="tags">
-						<div class="w3-container w3-padding">
-							<h2>Tags</h2>
-						</div>
-						<div class="w3-container w3-white">
-						{% for tag in metadata.tags %}
-							<a class="w3-button w3-tag {% if metadata.filter == tag %}w3-black{% else %}w3-dark-grey{% endif %} w3-margin-top w3-margin-bottom" href="{% if tag == '' %}./{% else %}filter/{{ tag }}{% endif %}">{% if tag == '' %}All Posts{% else %}{{ tag.title() }}{% endif %}</a>
-						{% endfor %}
-							<br />
-							<input id="search" type="text" class="w3-input w3-border w3-light-gray" placeholder="Search your own tag" onkeypress="if (window.event.keyCode == '13') search()" />
-							<script>function search(){var b=document.createElement('a');b.href='filter/'+document.getElementById('search').value;b.click();}</script>
-							<br />
-						</div>
-					</div>
-					<!--<hr >-->
-
-					<!--<div class="w3-card w3-margin w3-hide" id="ads">
-						<div class="w3-container w3-padding">
-							<h2>$upport ;)</h2>
-						</div>
-						<div class="w3-container w3-white w3-button w3-cell-row">
-							<div class="w3-cell">
-								<span class="w3-panel"><a href="http://onemboaran.com/afu.php?zoneid=3073204">Ad</a></span>
+				<aside>
+					<div class="w3-col l4" id="sidebar">
+						<div class="w3-card w3-margin w3-margin-top" id="about">
+							<img src="https://cdn.matthewrease.net/images/me_young.jp2" alt="My Mom holding my arm, while I (a child) am trying to pet a bear cub at the zoo." style="width:100%">
+							<div class="w3-container w3-white">
+								<h2><strong>Matthew Rease</strong></h2>
+								<p>Bedroom programmer, all-day nerd. I've been programming since I was in middle school, and I've always liked to entertain people, so I hope that will come across in my posts. If you want to learn more about me, see <a href="https://matthewrease.net/about/"><strong>my profile</strong></a>.</p>
 							</div>
 						</div>
-					</div>-->
-				</div>
+						<hr>
+
+						<nav>
+							<div class="w3-card w3-margin" id="popular">
+								<div class="w3-container w3-padding"><h2>Popular Posts</h2></div>
+								<ul class="w3-ul w3-hoverable w3-white">
+								{% for post in metadata.popular %}
+									<li class="w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
+										<article>
+											<a href="/post/{{ post.id }}" style="text-decoration:none">
+												<span class="w3-padding-16" style="display:block">
+													<img src="{{ post.image }}" alt="{{ post.image_alt }}" class="w3-left w3-margin-right" style="width: 50px" />
+													<span class="w3-large">{{ post.title }}</span>
+													<br />
+													<span>{{ post.description | safe }}</span>
+												</span>
+											</a>
+										</article>
+									</li>
+								{% endfor %}
+								</ul>
+							</div>
+							<hr>
+
+							<div class="w3-card w3-margin" id="archive">
+								<div class="w3-container w3-padding"><h2>Archive</h2></div>
+								<ul class="w3-ul w3-hoverable w3-white">
+								{% for year in metadata.archive %}
+									<li class="w3-padding-16 w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}')"><span class="w3-large">{{ year }}</span></li>
+								{% for month in metadata.archive[year] %}
+									<li class="w3-hide w3-white" id="{{ year }}">
+										<ul class="w3-ul w3-hoverable w3-white">
+											<li class="w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}{{ month }}')"><span class="w3-large">{{ metadata.month_names[month] }}</span></li>
+											<ul class="w3-ul w3-hoverable w3-white w3-hide" id="{{ year }}{{ month }}">
+											{% for short_id in metadata.archive[year][month] %}
+												<article>
+													<a href="/post/{{ year }}{{ month }}{{ short_id }}" style="text-decoration:none">
+														<li class="w3-padding-16 w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
+															<img data-src="/static/{{ year }}{{ month }}{{ short_id }}.webp" alt="{{ metadata.archive[year][month][short_id]['alt'] }}" class="lazyload w3-left w3-margin-right" style="width:50px" />
+															<span class="w3-large">{{ metadata.archive[year][month][short_id]['title'] }}</span>
+															<br />
+															<span>{{ metadata.archive[year][month][short_id]['description'] | safe }}</span>
+														</li>
+													</a>
+												</article>
+											{% endfor %}
+											</ul>
+										</ul>
+									</li>
+								{% endfor %}
+								{% endfor %}
+								</ul>
+								<script>function archive(e){var a=document.getElementById(e);-1==a.className.indexOf("w3-show")?a.className+=" w3-show":a.className=a.className.replace(" w3-show","")}</script>
+							</div>
+							<hr>
+
+							<div class="w3-card w3-margin" id="tags">
+								<div class="w3-container w3-padding">
+									<h2>Tags</h2>
+								</div>
+								<div class="w3-container w3-white">
+								{% for tag in metadata.tags %}
+									<a class="w3-button w3-tag {% if metadata.filter == tag %}w3-black{% else %}w3-dark-grey{% endif %} w3-margin-top w3-margin-bottom" href="{% if tag == '' %}./{% else %}filter/{{ tag }}{% endif %}">{% if tag == '' %}All Posts{% else %}{{ tag.title() }}{% endif %}</a>
+								{% endfor %}
+									<br />
+									<input id="search" type="text" class="w3-input w3-border w3-light-gray" placeholder="Search your own tag" onkeypress="if (window.event.keyCode == '13') search()" />
+									<script>function search(){var b=document.createElement('a');b.href='filter/'+document.getElementById('search').value;b.click();}</script>
+									<br />
+								</div>
+							</div>
+							<!--<hr >-->
+
+							<!--<div class="w3-card w3-margin w3-hide" id="ads">
+								<div class="w3-container w3-padding">
+									<h2>$upport ;)</h2>
+								</div>
+								<div class="w3-container w3-white w3-button w3-cell-row">
+									<div class="w3-cell">
+										<span class="w3-panel"><a href="http://onemboaran.com/afu.php?zoneid=3073204">Ad</a></span>
+									</div>
+								</div>
+							</div>-->
+						</nav>
+					</div>
+				</aside>
 			</div>
 			<br />
 		</div>
@@ -164,6 +172,7 @@
 		<footer class="w3-container w3-dark-grey w3-padding-32 w3-margin-top">
 			<a href="https://matthewrease.net/" class="w3-button w3-deep-orange w3-padding-large w3-margin-bottom">Return to the Inn</a>
 			{% block pagination %}{% endblock %}
+			<p>Site content copyright &copy; Matthew Rease 2025, articles licensed under CC BY-NC-SA 4.0 unless otherwise stated</p>
 			<p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank" rel="noopener">w3.css</a></p>
 		</footer>
 
