@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, Response
 from PIL import Image
 
-from md_ext import HeadingShiftExtension
+from md_ext import HeadingShiftExtension, HeadingLinkExtension
 
 load_dotenv()
 
@@ -349,12 +349,14 @@ def show_post(post_id):
             tuple())                               # Should do the WHERE first...
         author = context.get_user(res[1])
         image = Image.open(f'static/{res[8]}.webp')
-        md_body = markdown.markdown(res[5], extensions=["fenced_code", HeadingShiftExtension()])
+        md_body = markdown.markdown(
+            res[5],
+            extensions=["fenced_code", HeadingShiftExtension(), HeadingLinkExtension()])
 
         # All relevant data for Jinja template.
         metadata = {
             'csp': use_csp,
-            'base': '',
+            'base': f'post/{res[8]}',
             'canonical': f'post/{res[8]}',
             'popular': [
                 {

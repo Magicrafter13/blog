@@ -10,3 +10,7 @@ pre code {
 .markdown img {
 	width: 100%;
 }
+
+.markdown-heading {
+	color: #404040;
+}
