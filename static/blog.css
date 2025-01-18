@@ -6,3 +6,7 @@ pre code {
 	overflow-x: scroll;
 	display: block;
 }
+
+.markdown img {
+	width: 100%;
+}
