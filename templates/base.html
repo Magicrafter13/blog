@@ -142,11 +142,11 @@
 								</div>
 								<div class="w3-container w3-white">
 								{% for tag in metadata.tags %}
-									<a class="w3-button w3-tag {% if metadata.filter == tag %}w3-black{% else %}w3-dark-grey{% endif %} w3-margin-top w3-margin-bottom" href="{% if tag == '' %}./{% else %}filter/{{ tag }}{% endif %}">{% if tag == '' %}All Posts{% else %}{{ tag.title() }}{% endif %}</a>
+									<a class="w3-button w3-tag {% if metadata.filter == tag %}w3-black{% else %}w3-dark-grey{% endif %} w3-margin-top w3-margin-bottom" href="/{% if tag != '' %}filter/{{ tag }}{% endif %}">{% if tag == '' %}All Posts{% else %}{{ tag.title() }}{% endif %}</a>
 								{% endfor %}
 									<br />
 									<input id="search" type="text" class="w3-input w3-border w3-light-gray" placeholder="Search your own tag" onkeypress="if (window.event.keyCode == '13') search()" />
-									<script>function search(){var b=document.createElement('a');b.href='filter/'+document.getElementById('search').value;b.click();}</script>
+									<script>function search(){var b=document.createElement('a');b.href='/filter/'+document.getElementById('search').value;b.click();}</script>
 									<br />
 								</div>
 							</div>
