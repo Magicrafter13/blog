@@ -2,6 +2,7 @@
 """Compressed Thoughts blog, by Matthew Rease."""
 
 import threading
+from collections import Counter
 from datetime import datetime, timedelta
 from os import environ
 
@@ -207,8 +208,12 @@ http404_post_metadata = {
     },
     'content': markdown.markdown('If you think this is an error, then feel free to contact me about it.')  # pylint: disable=line-too-long
 }
+popular_posts = {
+    'last_check': datetime.now() - TWO_HOUR_DELTA,
+    'data': []
+}
 
-def get_top_tags(tag_filter):
+def get_top_tags(tag_filter: str) -> list[str]:
     """Generate list of the most used tags, including the current filter and an empty tag."""
     top_tags = list(context.get_top_tags())
     if tag_filter in top_tags:
@@ -217,6 +222,25 @@ def get_top_tags(tag_filter):
         top_tags.insert(0, tag_filter)
     top_tags.insert(0, '')
     return top_tags
+
+def get_popular_posts() -> list[str]:
+    """Generate list of popular posts from log, and cache."""
+    now = datetime.now()
+    if now - popular_posts['last_check'] > TWO_HOUR_DELTA:
+        popular_posts['last_check'] = now
+        try:
+            with open('uwsgi.log', 'r', encoding='utf-8') as log:
+                new_data = Counter()
+                for line in log.read().splitlines():
+                    if '] GET /post/' in line:
+                        new_data[line.split('] GET /post/')[1].split()[0]] += 1
+                popular_posts['data'] = [key for key, _ in new_data.most_common(3)]
+        except FileNotFoundError as _e:
+            print(_e)
+            redlog("Please create a log file, even if you won't use it, to minimize work on the server!")  # pylint: disable=line-too-long
+        #print(new_data)
+    #print(popular_posts)
+    return popular_posts['data'] or [ '202002101957', '202002261145', '202004161413' ]
 
 # Handle Pages
 @app.route('/')
@@ -228,7 +252,6 @@ def index(tag_filter='', page=0):
     try:
         # Prereqs for Jinja metadata.
         all_posts = context.get_all_posts_sidebar()
-        popular_posts = [ '202002101957', '202002261145', '202004161413' ]
         top_tags = get_top_tags(tag_filter)
         main_posts = [
             {
@@ -271,7 +294,7 @@ def index(tag_filter='', page=0):
                     'title': all_posts[id]['title'],
                     'description': all_posts[id]['description']
                 }
-                for id in popular_posts],
+                for id in get_popular_posts()],
             'tags': top_tags,
             'filter': tag_filter,
             'archive': context.generate_archive_dict(),
@@ -323,7 +346,6 @@ def show_post(post_id):
             return render_template('404_post.html', metadata=http404_post_metadata), 404
         res = res[0]
         all_posts = context.get_all_posts_sidebar()
-        popular_posts = [ '202002101957', '202002261145', '202004161413' ]
         # Alternate idea to get both tags_sql and the post in one query:
         #
         # SELECT Post.post_id, Post.title, ..., Tag.name
@@ -366,7 +388,7 @@ def show_post(post_id):
                     'title': all_posts[id]['title'],
                     'description': all_posts[id]['description']
                 }
-                for id in popular_posts],
+                for id in get_popular_posts()],
             'tags': [row[0] for row in tags_sql],
             'filter': '',
             'archive': context.generate_archive_dict(),

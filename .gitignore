@@ -1,3 +1,4 @@
 .env
 /static/*.webp
 /__pycache__/
+/uwsgi.log
