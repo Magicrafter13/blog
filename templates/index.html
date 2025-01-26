@@ -16,16 +16,6 @@
 	<meta property="og:site_name" content="Compressed Thoughts" />
 {% endblock %}
 
-{% if metadata.filter != '' and metadata.last != 0 %}
-{% block pagination %}
-<form action="/" method="GET" style="display: inline">
-	<input type="hidden" name="filter" value="{{ metadata.filter }}" />
-	<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page - 1 }}{% endif %}">Previous <i class="fas fa-angle-double-left"></i></a>
-	<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page + 1 }}{% endif %}">Next <i class="fas fa-angle-double-right"></i></a>
-</form>
-{% endblock %}
-{% endif %}
-
 {% block body %}
 {{ super() }}
 <div class="w3-col l8 s12" id="posts">
@@ -153,5 +143,23 @@
 			}
 		</script>
 	</main>
+	{% if metadata.last != 0 %}
+
+	<!-- Pagination -->
+	<form action="/" method="GET" style="display: inline">
+		<input type="hidden" name="filter" value="{{ metadata.filter }}" />
+		{% if metadata.last > 1 %}
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/0{% endif %}">First <i class="fas fa-angle-double-left"></i></a>
+		{% endif %}
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page - 1 }}{% endif %}">Previous <i class="fas fa-angle-left"></i></a>
+		{% for number in metadata.pages %}
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == number %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ number }}{% endif %}">{{ number }}</a>
+		{% endfor %}
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page + 1 }}{% endif %}">Next <i class="fas fa-angle-right"></i></a>
+		{% if metadata.last > 1 %}
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.last }}{% endif %}">Last <i class="fas fa-angle-double-right"></i></a>
+		{% endif %}
+	</form>
+	{% endif %}
 </div>
 {% endblock %}

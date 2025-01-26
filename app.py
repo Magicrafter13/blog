@@ -253,6 +253,13 @@ def index(tag_filter='', page=0):
         # Prereqs for Jinja metadata.
         all_posts = context.get_all_posts_sidebar()
         top_tags = get_top_tags(tag_filter)
+        last_page = (context.get_post_count() - 1) // 5 if tag_filter == '' else (context.execute(
+            """
+            SELECT COUNT(DISTINCT PostTag.post_id)
+            FROM PostTag
+            JOIN Tag ON Tag.tag_id = PostTag.tag_id
+            WHERE LOWER(Tag.name) LIKE %s;""",
+            (f'%{tag_filter.lower()}%',))[0][0] - 1) // 5
         main_posts = [
             {
                 'id': row[6],
@@ -313,14 +320,9 @@ def index(tag_filter='', page=0):
                 '12': 'December'
             },
             'page': page,
-            'last': (context.get_post_count() - 1) // 5 if tag_filter == '' else (context.execute(
-                """
-                SELECT COUNT(DISTINCT PostTag.post_id)
-                FROM PostTag
-                JOIN Tag ON Tag.tag_id = PostTag.tag_id
-                WHERE LOWER(Tag.name) LIKE %s;""",
-                (f'%{tag_filter.lower()}%',))[0][0] - 1) // 5,
-            'posts': main_posts
+            'last': last_page,
+            'posts': main_posts,
+            'pages': list(range(max(0, page - 3), min(last_page + 1, page + 4)))
         }
         return render_template('index.html', metadata=metadata)
 
