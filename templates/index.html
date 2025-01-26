@@ -35,7 +35,7 @@
 					{{ post.preview | safe }}
 					<div class="w3-row">
 						<div class="w3-col m8 s12">
-							<p><a href="/post/{{ post.id }}" class="w3-button w3-padding-large w3-white w3-border"><strong>READ MORE <i class="nf nf-md-file_document w3-xlarge"></i></strong></a></p>
+							<p><a href="/post/{{ post.id }}" class="w3-button w3-padding-large w3-white w3-border"><strong>READ MORE <i class="nf nf-md-file_document w3-xlarge" aria-hidden="true"></i></strong></a></p>
 						</div>
 						<!--<div class="w3-col m4 w3-hide-small">
 							<p><span class="w3-padding-large w3-right"><strong>Comments   </strong> <span class="fa-stack"><i class="fas fa-stack-2x fa-comment-alt"></i>#</span></span></p>
@@ -149,15 +149,15 @@
 	<form action="/" method="GET" style="display: inline">
 		<input type="hidden" name="filter" value="{{ metadata.filter }}" />
 		{% if metadata.last > 1 %}
-		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/0{% endif %}">First <i class="nf nf-fa-angle_double_left"></i></a>
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/0{% endif %}" aria-label="First page">First <i class="nf nf-fa-angle_double_left" aria-hidden="true"></i></a>
 		{% endif %}
-		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page - 1 }}{% endif %}">Previous <i class="nf nf-fa-angle_left"></i></a>
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page - 1 }}{% endif %}" aria-label="Previous page">Previous <i class="nf nf-fa-angle_left" aria-hidden="true"></i></a>
 		{% for number in metadata.pages %}
-		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == number %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ number }}{% endif %}">{{ number }}</a>
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == number %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ number }}{% endif %}" aria-label="Page {{ number }}">{{ number }}</a>
 		{% endfor %}
-		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page + 1 }}{% endif %}">Next <i class="nf nf-fa-angle_right"></i></a>
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page + 1 }}{% endif %}" aria-label="Next page">Next <i class="nf nf-fa-angle_right" aria-hidden="true"></i></a>
 		{% if metadata.last > 1 %}
-		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.last }}{% endif %}">Last <i class="nf nf-fa-angle_double_right"></i></a>
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.last }}{% endif %}" aria-label="Last page">Last <i class="nf nf-fa-angle_double_right" aria-hidden="true"></i></a>
 		{% endif %}
 	</form>
 	{% endif %}
