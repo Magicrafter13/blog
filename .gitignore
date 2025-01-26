@@ -2,3 +2,5 @@
 /static/*.webp
 /__pycache__/
 /uwsgi.log
+/static/nerdfont.css
+/static/nerdfont.woff2

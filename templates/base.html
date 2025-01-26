@@ -7,15 +7,15 @@
 			default-src 'none';
 			base-uri blog.matthewrease.net;
 			child-src 'none';
-			connect-src blog.matthewrease.net ka-f.fontawesome.com/releases/;
-			font-src fonts.gstatic.com ka-f.fontawesome.com/releases/;
+			connect-src blog.matthewrease.net;
+			font-src 'self' fonts.gstatic.com;
 			form-action blog.matthewrease.net;
 			frame-src 'none';
 			img-src 'self' cdn.matthewrease.net;
 			media-src 'none';
 			object-src 'none';
-			script-src 'self' 'unsafe-inline' cdn.matthewrease.net kit.fontawesome.com/b30914b072.js;
-			style-src 'self' 'unsafe-inline' www.w3schools.com/w3css/ ka-f.fontawesome.com/releases/ fonts.googleapis.com
+			script-src 'self' 'unsafe-inline' cdn.matthewrease.net;
+			style-src 'self' 'unsafe-inline' www.w3schools.com/w3css/ fonts.googleapis.com
 		" />
 		{% endif %}
 		<meta charset="utf-8" />
@@ -50,12 +50,8 @@
 		<link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Raleway" onload="this.onload=null;this.rel='stylesheet'" />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" />
 
-		<script defer src="https://kit.fontawesome.com/b30914b072.js"
-		integrity="sha384-JADOYKRr+MePSso2xDJGEWtXwflVrwAZdUCl9tDvakynWQnnu/GsJV06tL33Vy56"
-		crossorigin="anonymous"
-		data-auto-add-css="false"></script>
-		<link re="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://ka-f.fontawesome.com/releases/v5.15.2/css/free.min.css?token=b30914b072" />
-		<link rel="stylesheet" href="https://ka-f.fontawesome.com/releases/v5.15.2/css/free.min.css?token=b30914b072" />
+		<link re="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/static/nerdfont.css" />
+		<link rel="stylesheet" href="/static/nerdfont.css" />
 
 		{% block embed %}{% endblock %}
 
