@@ -1,5 +1,3 @@
-<!-- vim: ft=html
--->
 <!DOCTYPE html>
 <html prefix="og: http://ogp.me/ns/article#" lang="en">
 	<head>
@@ -106,20 +104,20 @@
 								<div class="w3-container w3-padding"><h2>Archive</h2></div>
 								<ul class="w3-ul w3-hoverable w3-white">
 								{% for year in metadata.archive %}
-									<li class="w3-padding-16 w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}')"><span class="w3-large">{{ year }}</span></li>
+									<li class="w3-padding-16 w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}')" onkeydown="key_archive(event, '{{ year }}')" tabindex="0" role="button" aria-expanded="false" id="button-{{ year }}"><span class="w3-large">{{ year }}</span></li>
 								{% for month in metadata.archive[year] %}
 									<li class="w3-hide w3-white" id="{{ year }}">
 										<ul class="w3-ul w3-hoverable w3-white">
-											<li class="w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}{{ month }}')"><span class="w3-large">{{ metadata.month_names[month] }}</span></li>
+											<li class="w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}{{ month }}')" onkeydown="key_archive(event, '{{ year }}{{ month }}')" tabindex="0" role="button" aria-expanded="false" id="button-{{ year }}{{ month }}"><span class="w3-large">{{ metadata.month_names[month] }}</span></li>
 											<ul class="w3-ul w3-hoverable w3-white w3-hide" id="{{ year }}{{ month }}">
 											{% for short_id in metadata.archive[year][month] %}
 												<article>
-													<a href="/post/{{ year }}{{ month }}{{ short_id }}" style="text-decoration:none">
+													<a href="/post/{{ year }}{{ month }}{{ short_id }}" style="text-decoration:none" aria-labelledby="archive-{{ year }}{{ month }}{{ short_id }}-title">
 														<li class="w3-padding-16 w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
 															<img data-src="/static/{{ year }}{{ month }}{{ short_id }}.webp" alt="{{ metadata.archive[year][month][short_id]['alt'] }}" class="lazyload w3-left w3-margin-right" style="width:50px" />
-															<span class="w3-large">{{ metadata.archive[year][month][short_id]['title'] }}</span>
+															<span class="w3-large" id="archive-{{ year }}{{ month }}{{ short_id }}-title">{{ metadata.archive[year][month][short_id]['title'] }}</span>
 															<br />
-															<span>{{ metadata.archive[year][month][short_id]['description'] | safe }}</span>
+															<span tabindex="-1">{{ metadata.archive[year][month][short_id]['description'] | safe }}</span>
 														</li>
 													</a>
 												</article>
@@ -130,7 +128,25 @@
 								{% endfor %}
 								{% endfor %}
 								</ul>
-								<script>function archive(e){var a=document.getElementById(e);-1==a.className.indexOf("w3-show")?a.className+=" w3-show":a.className=a.className.replace(" w3-show","")}</script>
+								<script>
+									function archive(e) {
+										var a = document.getElementById(e);
+										var b = document.getElementById("button-" + e);
+										if (a.className.indexOf("w3-show") == -1) {
+											a.className += " w3-show";
+											b.ariaExpanded = "true";
+										}
+										else {
+											a.className = a.className.replace(" w3-show", "");
+											b.ariaExpanded = "false";
+										}
+									}
+									function key_archive(e, i) {
+										if (e.key === 'Enter') {
+											archive(i)
+										}
+									}
+								</script>
 							</div>
 							<hr>
 
