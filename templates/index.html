@@ -1,3 +1,5 @@
+<!-- vim: ft=html
+-->
 {% extends "base.html" %}
 
 {% block embed %}
@@ -26,7 +28,7 @@
 				<img src="{{ post.image }}" alt="{{ post.image_alt }}" style="width: 100%" />
 				<div class="w3-container">
 					<hgroup>
-						<h3><strong>{{ post.title }}</strong>{% if post.author != 'Matthew Rease' %}<span class="w3-medium">, by {{ post.author }}</span>{% endif %}</h3>
+						<h3 id="main-{{ post.id }}-title"><strong>{{ post.title }}</strong>{% if post.author != 'Matthew Rease' %}<span class="w3-medium">, by {{ post.author }}</span>{% endif %}</h3>
 						<p>{{ post.description | safe }}, <time datetime="{{ post.published }}" class="w3-opacity">{{ post.datestr }}</time></p>
 					</hgroup>
 				</div>
@@ -35,7 +37,7 @@
 					{{ post.preview | safe }}
 					<div class="w3-row">
 						<div class="w3-col m8 s12">
-							<p><a href="/post/{{ post.id }}" class="w3-button w3-padding-large w3-white w3-border"><strong>READ MORE <i class="nf nf-md-file_document w3-xlarge" aria-hidden="true"></i></strong></a></p>
+							<p><a href="/post/{{ post.id }}" class="w3-button w3-padding-large w3-white w3-border" aria-describedby="main-{{ post.id }}-title"><strong>READ MORE <i class="nf nf-md-file_document w3-xlarge" aria-hidden="true"></i></strong></a></p>
 						</div>
 						<!--<div class="w3-col m4 w3-hide-small">
 							<p><span class="w3-padding-large w3-right"><strong>Comments   </strong> <span class="fa-stack"><i class="fas fa-stack-2x fa-comment-alt"></i>#</span></span></p>
@@ -153,7 +155,7 @@
 		{% endif %}
 		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == 0 %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page - 1 }}{% endif %}" aria-label="Previous page">Previous <i class="nf nf-fa-angle_left" aria-hidden="true"></i></a>
 		{% for number in metadata.pages %}
-		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == number %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ number }}{% endif %}" aria-label="Page {{ number }}">{{ number }}</a>
+		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == number %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ number }}{% endif %}" aria-current="{% if number == metadata.page %}page{% else %}false{% endif %}" aria-label="Page {{ number }}">{{ number }}</a>
 		{% endfor %}
 		<a class="w3-button w3-black w3-padding-large w3-margin-bottom{% if metadata.page == metadata.last %} w3-disabled{% else %}" href="{% if metadata.filter != '' %}filter/{{ metadata.filter }}/{% endif %}page/{{ metadata.page + 1 }}{% endif %}" aria-label="Next page">Next <i class="nf nf-fa-angle_right" aria-hidden="true"></i></a>
 		{% if metadata.last > 1 %}

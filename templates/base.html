@@ -1,3 +1,5 @@
+<!-- vim: ft=html
+-->
 <!DOCTYPE html>
 <html prefix="og: http://ogp.me/ns/article#" lang="en">
 	<head>
@@ -85,12 +87,12 @@
 								{% for post in metadata.popular %}
 									<li class="w3-button" style="display:block!important;white-space:normal!important;text-align:left!important">
 										<article>
-											<a href="/post/{{ post.id }}" style="text-decoration:none">
+											<a href="/post/{{ post.id }}" style="text-decoration:none" aria-labelledby="{{ post.id }}-title">
 												<span class="w3-padding-16" style="display:block">
 													<img src="{{ post.image }}" alt="{{ post.image_alt }}" class="w3-left w3-margin-right" style="width: 50px" />
-													<span class="w3-large">{{ post.title }}</span>
+													<span class="w3-large" id="{{ post.id }}-title">{{ post.title }}</span>
 													<br />
-													<span>{{ post.description | safe }}</span>
+													<span tabindex="-1">{{ post.description | safe }}</span>
 												</span>
 											</a>
 										</article>
@@ -138,7 +140,7 @@
 								</div>
 								<div class="w3-container w3-white">
 								{% for tag in metadata.tags %}
-									<a class="w3-button w3-tag {% if metadata.filter == tag %}w3-black{% else %}w3-dark-grey{% endif %} w3-margin-top w3-margin-bottom" href="/{% if tag != '' %}filter/{{ tag }}{% endif %}">{% if tag == '' %}All Posts{% else %}{{ tag.title() }}{% endif %}</a>
+									<a class="w3-button w3-tag {% if metadata.filter == tag %}w3-black{% else %}w3-dark-grey{% endif %} w3-margin-top w3-margin-bottom" href="/{% if tag != '' %}filter/{{ tag }}{% endif %}" aria-selected="{% if tag == metadata.filter %}true{% else %}false{% endif %}" aria-label="{% if tag == '' %}Remove filter and show All Posts{% else %}set filter to {{ tag }}{% endif %}">{% if tag == '' %}All Posts{% else %}{{ tag.title() }}{% endif %}</a>
 								{% endfor %}
 									<br />
 									<input id="search" type="text" class="w3-input w3-border w3-light-gray" placeholder="Search your own tag" onkeypress="if (window.event.keyCode == '13') search()" />
@@ -166,7 +168,7 @@
 		</div>
 
 		<footer class="w3-container w3-dark-grey w3-padding-32 w3-margin-top">
-			<a href="https://matthewrease.net/" class="w3-button w3-deep-orange w3-padding-large w3-margin-bottom">Return to the Inn</a>
+			<a href="https://matthewrease.net/" class="w3-button w3-deep-orange w3-padding-large w3-margin-bottom w3-text-black">Return to the Inn</a>
 			<p>Site content copyright &copy; Matthew Rease 2025, articles licensed under CC BY-NC-SA 4.0 unless otherwise stated</p>
 			<p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank" rel="noopener">w3.css</a></p>
 		</footer>
