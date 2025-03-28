@@ -105,9 +105,9 @@
 								<ul class="w3-ul w3-hoverable w3-white">
 								{% for year in metadata.archive %}
 									<li class="w3-padding-16 w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}')" onkeydown="key_archive(event, '{{ year }}')" tabindex="0" role="button" aria-expanded="false" id="button-{{ year }}"><span class="w3-large">{{ year }}</span></li>
-								{% for month in metadata.archive[year] %}
 									<li class="w3-hide w3-white" id="{{ year }}">
 										<ul class="w3-ul w3-hoverable w3-white">
+										{% for month in metadata.archive[year] | reverse %}
 											<li class="w3-button w3-block w3-white w3-left-align" onclick="archive('{{ year }}{{ month }}')" onkeydown="key_archive(event, '{{ year }}{{ month }}')" tabindex="0" role="button" aria-expanded="false" id="button-{{ year }}{{ month }}"><span class="w3-large">{{ metadata.month_names[month] }}</span></li>
 											<ul class="w3-ul w3-hoverable w3-white w3-hide" id="{{ year }}{{ month }}">
 											{% for short_id in metadata.archive[year][month] %}
@@ -123,9 +123,9 @@
 												</article>
 											{% endfor %}
 											</ul>
+										{% endfor %}
 										</ul>
 									</li>
-								{% endfor %}
 								{% endfor %}
 								</ul>
 								<script>
