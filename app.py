@@ -24,9 +24,10 @@ class DBContextManager:
     def __init__(self):
         """Create persistent Blog MySQL database connection and establish cache."""
         self.credentials = {
-            'user': environ.get('MYSQL_USER'),
-            'password': environ.get('MYSQL_PASSWORD'),
-            'database': environ.get('MYSQL_DATABASE') }
+            'host': environ.get('MYSQL_HOST', 'localhost'),
+            'user': environ.get('MYSQL_USER', 'blog'),
+            'password': environ.get('MYSQL_PASSWORD', 'blog'),
+            'database': environ.get('MYSQL_DATABASE', 'blog') }
 
         self.db = None
         self.cursor = None
@@ -56,6 +57,7 @@ class DBContextManager:
     def connect(self):
         """Connect to database using environment variables."""
         self.db = MySQLdb.connect(
+            host=self.credentials['host'],
             user=self.credentials['user'],
             password=self.credentials['password'],
             database=self.credentials['database'])
