@@ -1,5 +1,7 @@
 #!/usr/bin/sh
 
+mkdir -p static
+
 curl -LO 'https://www.nerdfonts.com/assets/css/webfont.css'
 mv webfont.css static/nerdfont.css
 sed -i 's#\.\./fonts/Symbols-2048-em Nerd Font Complete.woff2#/static/nerdfont.woff2#' static/nerdfont.css
