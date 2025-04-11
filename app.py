@@ -242,7 +242,7 @@ def get_popular_posts() -> list[str]:
             redlog("Please create a log file, even if you won't use it, to minimize work on the server!")  # pylint: disable=line-too-long
         #print(new_data)
     #print(popular_posts)
-    return popular_posts['data'] or [ '202002101957', '202002261145', '202004161413' ]
+    return popular_posts['data'] or [] # [ '202002101957', '202002261145', '202004161413' ]
 
 # Handle Pages
 @app.route('/')
