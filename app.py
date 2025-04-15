@@ -9,7 +9,7 @@ from os import environ
 import markdown
 import MySQLdb
 from dotenv import load_dotenv
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, send_file
 from PIL import Image
 
 from md_ext import HeadingShiftExtension, HeadingLinkExtension
@@ -150,6 +150,9 @@ class DBContextManager:
 app = Flask(__name__)
 context = DBContextManager()
 
+# For uWSGI
+application = app
+
 def redlog(msg):
     """Print red text to log (easily distinguished from Flask logging)."""
     print(f'\x1b[31m{msg}\x1b[0m')
@@ -167,7 +170,7 @@ http404_post_metadata = {
     #'popular': [
     #    {
     #        'id': id,
-    #        'image': f'/static/{id}.webp',
+    #        'image': f'/static/images/{id}.webp',
     #        'image_alt': all_posts[id]['alt'],
     #        'title': all_posts[id]['title'],
     #        'description': all_posts[id]['description']
@@ -265,7 +268,7 @@ def index(tag_filter='', page=0):
         main_posts = [
             {
                 'id': row[6],
-                'image': f'/static/{row[6]}.webp',
+                'image': f'/static/images/{row[6]}.webp',
                 'image_alt': row[7],
                 'title': row[1],
                 'description': row[2],
@@ -298,7 +301,7 @@ def index(tag_filter='', page=0):
             'popular': [
                 {
                     'id': id,
-                    'image': f'/static/{id}.webp',
+                    'image': f'/static/images/{id}.webp',
                     'image_alt': all_posts[id]['alt'],
                     'title': all_posts[id]['title'],
                     'description': all_posts[id]['description']
@@ -374,7 +377,7 @@ def show_post(post_id):
             WHERE PostTag.post_id = {res[0]};""",  # Not explicitly optimized
             tuple())                               # Should do the WHERE first...
         author = context.get_user(res[1])
-        image = Image.open(f'static/{res[8]}.webp')
+        image = Image.open(f'static/images/{res[8]}.webp')
         md_body = markdown.markdown(
             res[5],
             extensions=["fenced_code", HeadingShiftExtension(), HeadingLinkExtension()])
@@ -387,7 +390,7 @@ def show_post(post_id):
             'popular': [
                 {
                     'id': id,
-                    'image': f'/static/{id}.webp',
+                    'image': f'/static/images/{id}.webp',
                     'image_alt': all_posts[id]['alt'],
                     'title': all_posts[id]['title'],
                     'description': all_posts[id]['description']
@@ -414,7 +417,7 @@ def show_post(post_id):
             'description': res[3],
             'author': author,
             'image': {
-                'url': f'/static/{res[8]}.webp',
+                'url': f'/static/images/{res[8]}.webp',
                 'width': image.size[0],
                 'height': image.size[1],
                 'alt': res[9]
@@ -442,7 +445,7 @@ def rss():
                 'id': id,
                 'description': post['description'],
                 'image': {
-                    'url': f'/static/{id}.webp',
+                    'url': f'/static/images/{id}.webp',
                     'size': 0
                 },
                 'published': post['published'].astimezone().replace(microsecond=0).isoformat(),
@@ -481,6 +484,3 @@ def sitemap():
         reverse=True)
 
     return Response(render_template('sitemap.xml', posts=posts), mimetype='application/xml')
-
-# For uWSGI
-application = app

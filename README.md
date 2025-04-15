@@ -1,5 +1,6 @@
 # What is this?
-The web server code and webpage templates for [my blog](https://blog.matthewrease.net).
+The web server code and webpage templates for
+[my blog](https://blog.matthewrease.net).
 ## Why?
 My old system, though neat in its own right, especially for something I came up
 with around 2019/2020 when I had little to no experience in such things, had
