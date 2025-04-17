@@ -4,3 +4,4 @@
 /uwsgi.log
 /static/nerdfont.css
 /static/nerdfont.woff2
+/static/lazysizes.min.js

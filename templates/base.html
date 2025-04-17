@@ -5,33 +5,33 @@
 		{% if metadata.csp %}
 		<meta http-equiv="Content-Security-Policy" content="
 			default-src 'none';
-			base-uri blog.matthewrease.net;
+			base-uri {{ metadata.config.blog_url }};
 			child-src 'none';
-			connect-src blog.matthewrease.net;
+			connect-src {{ metadata.config.blog_url }};
 			font-src 'self' fonts.gstatic.com;
-			form-action blog.matthewrease.net;
+			form-action {{ metadata.config.blog_url }};
 			frame-src 'none';
-			img-src 'self' cdn.matthewrease.net;
+			img-src 'self' {{ metadata.config.csp_img_src }};
 			media-src 'none';
 			object-src 'none';
-			script-src 'self' 'unsafe-inline' cdn.matthewrease.net;
+			script-src 'self' 'unsafe-inline';
 			style-src 'self' 'unsafe-inline' www.w3schools.com/w3css/ fonts.googleapis.com
 		" />
 		{% endif %}
 		<meta charset="utf-8" />
 		<base href="/{{ metadata.base }}" />
-		<link rel="canonical" href="https://blog.matthewrease.net/{{ metadata.canonical }}" />
+		<link rel="canonical" href="https://{{ metadata.config.blog_url }}/{{ metadata.canonical }}" />
 
 		<!-- Traditional Metadata -->
-		<title>Compressed Thoughts</title>
-		<meta name="title" content="{% block title %}Compressed Thoughts{% endblock %}" />
-		<meta name="description" content="{% block description %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endblock %}" />
-		<meta name="keywords" content="matthew, rease, old, forge, inn, tofi, compressed, thoughts, blog, post, tech, technology, personal, life, blogging{% block keywords %}{% endblock %}" />
+		<title>{{ metadata.config.blog_title }}</title>
+		<meta name="title" content="{% block title %}{{ metadata.config.blog_title }}{% endblock %}" />
+		<meta name="description" content="{% block description %}{{ metadata.config.blog_description }}{% endblock %}" />
+		<meta name="keywords" content="{{ ', '.join(metadata.config.blog_keywords) }}{% block keywords %}{% endblock %}" />
 		<meta name="revisit-after" content="{% block revisit %}8 Hours{% endblock %}" />
-		<meta name="author" content="{% block author %}Matthew Rease{% endblock %}" />
-		<meta name="designer" content="Matthew Rease" />
+		<meta name="author" content="{% block author %}{{ metadata.config.blog_author }}{% endblock %}" />
+		<meta name="designer" content="{{ metadata.config.blog_author }}" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="copyright" content="Copyright &copy; {{ 2025 }} Matthew Rease" />
+		<meta name="copyright" content="Copyright &copy; {{ metadata.now.year }} {{ metadata.config.blog_author }}" />
 		<meta name="language" content="English" />
 
 		{% block bots %}
@@ -61,8 +61,8 @@
 	<body class="w3-dark-grey">
 		<div class="w3-content" style="max-width: 1400px">
 			<header class="w3-container w3-center w3-padding-32">
-				<h1><strong>Compressed Thoughts</strong></h1>
-				<p>A blog by <span class="w3-tag">Matthew Rease</span></p>
+				<h1><strong>{{ metadata.config.blog_title }}</strong></h1>
+				<p>A blog by <span class="w3-tag">{{ metadata.config.blog_author }}</span></p>
 			</header>
 			<div class="w3-row">
 				{% block body %}{% endblock %}
@@ -70,10 +70,10 @@
 				<aside>
 					<div class="w3-col l4" id="sidebar">
 						<div class="w3-card w3-margin w3-margin-top" id="about">
-							<img src="https://cdn.matthewrease.net/images/me_young.jp2" alt="My Mom holding my arm, while I (a child) am trying to pet a bear cub at the zoo." style="width:100%">
+							<img src="{{ metadata.config.profile_image_url }}" alt="{{ metadata.config.profile_image_alt }}" style="width:100%">
 							<div class="w3-container w3-white">
-								<h2><strong>Matthew Rease</strong></h2>
-								<p>Bedroom programmer, all-day nerd. I've been programming since I was in middle school, and I've always liked to entertain people, so I hope that will come across in my posts. If you want to learn more about me, see <a href="https://matthewrease.net/about/"><strong>my profile</strong></a>.</p>
+								<h2><strong>{{ metadata.config.blog_author }}</strong></h2>
+								<p>{{ metadata.config.profile_text | safe }}</p>
 							</div>
 						</div>
 						<hr>
@@ -172,7 +172,7 @@
 								</div>
 								<div class="w3-container w3-white w3-button w3-cell-row">
 									<div class="w3-cell">
-										<span class="w3-panel"><a href="http://onemboaran.com/afu.php?zoneid=3073204">Ad</a></span>
+										<span class="w3-panel"><a href="">Ad</a></span>
 									</div>
 								</div>
 							</div>-->
@@ -184,11 +184,13 @@
 		</div>
 
 		<footer class="w3-container w3-dark-grey w3-padding-32 w3-margin-top">
-			<a href="https://matthewrease.net/" class="w3-button w3-deep-orange w3-padding-large w3-margin-bottom w3-text-black">Return to the Inn</a>
-			<p>Site content copyright &copy; Matthew Rease 2025, articles licensed under CC BY-NC-SA 4.0 unless otherwise stated</p>
-			<p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank" rel="noopener">w3.css</a></p>
+			{% if metadata.config.external_url %}
+			<a href="{{ metadata.config.external_url }}" class="w3-button w3-deep-orange w3-padding-large w3-margin-bottom w3-text-black">{{ metadata.config.external_text }}</a>
+			{% endif %}
+			<p>Site content copyright &copy; {{ metadata.config.blog_author }} {{ metadata.now.year }}, articles licensed under <a href="{{ metadata.config.post_license_url }}">{{ metadata.config.post_license }}</a> unless otherwise stated.</p>
+			<p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank" rel="noopener">w3.css</a>.</p>
 		</footer>
 
-		<script src="https://cdn.matthewrease.net/scripts/lazysizes.min.js" async></script>
+		<script src="/static/lazysizes.min.js" async></script>
 	</body>
 </html>

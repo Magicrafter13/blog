@@ -2,18 +2,18 @@
 
 {% block embed %}
 	<!-- Required OpenGraph Tags -->
-	<meta property="og:title" content="Compressed Thoughts" />
+	<meta property="og:title" content="{{ metadata.config.blog_title }}" />
 	<meta property="og:type" content="article" />
-	<meta property="og:image" content="https://blog.matthewrease.net/icon.webp" />
+	<meta property="og:image" content="https://{{ metadata.config.blog_url }}/static/icon.webp" />
 	<meta property="og:image:type" content="image/webp" />
-	<meta property="og:image:width" content="548" />
-	<meta property="og:image:height" content="548" />
-	<meta property="og:image:alt" content="Silhouette of a human head between a vise clamp." />
-	<meta property="og:url" content="https://blog.matthewrease.net/{{ metadata.canonical }}" />
+	<meta property="og:image:width" content="{{ metadata.config.blog_icon.width }}" />
+	<meta property="og:image:height" content="{{ metadata.config.blog_icon.height }}" />
+	<meta property="og:image:alt" content="{{ metadata.config.blog_icon.alt }}" />
+	<meta property="og:url" content="https://{{ metadata.config.blog_url }}/{{ metadata.canonical }}" />
 
 	<!-- Optional OpenGraph Tags -->
-	<meta property="og:description" content="{% if 'description' in metadata %}{{ metadata.description | striptags }}{% else %}Welcome to the thoughts of 1/7,762,000,000 of the world.{% endif %}" />
-	<meta property="og:site_name" content="Compressed Thoughts" />
+	<meta property="og:description" content="{% if 'description' in metadata %}{{ metadata.description | striptags }}{% else %}{{ metadata.config.blog_description }}{% endif %}" />
+	<meta property="og:site_name" content="{{ metadata.config.blog_title }}" />
 {% endblock %}
 
 {% block body %}
@@ -26,7 +26,7 @@
 				<img src="{{ post.image }}" alt="{{ post.image_alt }}" style="width: 100%" />
 				<div class="w3-container">
 					<hgroup>
-						<h3 id="main-{{ post.id }}-title"><strong>{{ post.title }}</strong>{% if post.author != 'Matthew Rease' %}<span class="w3-medium">, by {{ post.author }}</span>{% endif %}</h3>
+						<h3 id="main-{{ post.id }}-title"><strong>{{ post.title }}</strong>{% if post.author != metadata.config.blog_author %}<span class="w3-medium">, by {{ post.author }}</span>{% endif %}</h3>
 						<p>{{ post.description | safe }}, <time datetime="{{ post.published }}" class="w3-opacity">{{ post.datestr }}</time></p>
 					</hgroup>
 				</div>
@@ -85,23 +85,23 @@
 					"image/webp"
 				],
 				"inLanguage": "en-us",
-				"license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+				"license": "{{ metadata.config.post_license_url }}",
 				"creator": {
 					"@type": "Person",
-					"name": "Matthew Rease"
+					"name": "{{ metadata.config.blog_author }}"
 				},
-				"headline": "Compressed Thoughts",
-				"keywords": "matthew, rease, old, forge, inn, tofi",
-				"mainEntityOfPage": "https://blog.matthewrease.net/",
+				"headline": "{{ metadata.config.blog_title }}",
+				"keywords": "{{ ', '.join(metadata.config.blog_keywords) }}",
+				"mainEntityOfPage": "https://{{ metadata.config.blog_url }}/",
 				"publisher": {
 					"@type": "Organization",
-					"name": "Compressed Thoughts",
+					"name": "{{ metadata.config.blog_title }}",
 					"logo": {
 						"@type": "ImageObject",
 						"encodingFormat": "image/webp",
-						"url": "https://blog.matthewrease.net/static/icon.webp",
-						"width": "548",
-						"height": "548"
+						"url": "https://{{ metadata.config.blog_url }}/static/icon.webp",
+						"width": "{{ metadata.config.blog_icon.width }}",
+						"height": "{{ metadata.config.blog_icon.height }}"
 					}
 				},
 				"mainEntity": {
@@ -110,7 +110,7 @@
 					{% for post in metadata.posts %}
 						{
 							"@type": "BlogPosting",
-							"mainEntityOfPage": "https://blog.matthewrease.net/post/{{ post.id }}",
+							"mainEntityOfPage": "https://{{ metadata.config.blog_url }}/post/{{ post.id }}",
 							"headline": "{{ post.title | replace('"', '\\"') | safe }}",
 							"description": "{{ post.description | striptags | replace('"', '\\"') | safe }}",
 							"articleBody": "{{ post.preview | striptags | replace('"', '\\"') | safe }}",
@@ -127,13 +127,13 @@
 							"dateModified": "{{ post.modified }}",
 							"publisher": {
 								"@type": "Organization",
-								"name": "Compressed Thoughts",
+								"name": "{{ metadata.config.blog_title }}",
 								"logo": {
 									"@type": "ImageObject",
 									"encodingFormat": "image/webp",
-									"url": "https://blog.matthewrease.net/static/icon.webp",
-									"width": "548",
-									"height": "548"
+									"url": "https://{{ metadata.config.blog_url }}/static/icon.webp",
+									"width": "{{ metadata.config.blog_icon.width }}",
+									"height": "{{ metadata.config.blog_icon.height }}"
 								}
 							}
 						}{% if not loop.last %},{% endif %}

@@ -9,16 +9,16 @@
 	<!-- Required OpenGraph Tags -->
 	<meta property="og:title" content="{{ metadata.title }}" />
 	<meta property="og:type" content="article" />
-	<meta property="og:image" content="https://blog.matthewrease.net{{ metadata.image.url }}" />
+	<meta property="og:image" content="https://{{ metadata.config.blog_url }}{{ metadata.image.url }}" />
 	<meta property="og:image:type" content="image/webp" />
 	<meta property="og:image:width" content="{{ metadata.image.width }}" />
 	<meta property="og:image:height" content="{{ metadata.image.height }}" />
 	<meta property="og:image:alt" content="{{ metadata.image.alt }}" />
-	<meta property="og:url" content="https://blog.matthewrease.net/{{ metadata.canonical }}" />
+	<meta property="og:url" content="https://{{ metadata.config.blog_url }}/{{ metadata.canonical }}" />
 
 	<!-- Optional OpenGraph Tags -->
 	<meta property="og:description" content="{{ metadata.description | striptags }}" />
-	<meta property="og:site_name" content="Compressed Thoughts" />
+	<meta property="og:site_name" content="{{ metadata.config.blog_title }}" />
 
 	<!-- Specialized OpenGraph Tags -->
 	<meta property="og:article:published_time" content="{{ metadata.published }}" />
@@ -28,10 +28,10 @@
 
 	<!-- Twitter Embed Tags -->
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:url" content="https://blog.matthewrease.net/{{ metadata.canonical }}" />
+	<meta name="twitter:url" content="https://{{ metadata.config.blog_url }}/{{ metadata.canonical }}" />
 	<meta name="twitter:title" content="{{ metadata.title }}" />
 	<meta name="twitter:description" content="{{ metadata.description | striptags }}" />
-	<meta name="twitter:image" content="https://blog.matthewrease.net{{ metadata.image.url }}" />
+	<meta name="twitter:image" content="https://{{ metadata.config.blog_url }}{{ metadata.image.url }}" />
 {% endblock %}
 {% block json %}
 	<!-- JSON LD -->
@@ -46,19 +46,19 @@
 			"image/webp"
 		],
 		"inLanguage": "en-us",
-		"license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+		"license": "{{ metadata.config.post_license_url }}",
 		"publisher": {
 			"@type": "Organization",
-			"name": "Compressed Thoughts",
+			"name": "{{ metadata.config.blog_title }}",
 			"logo": {
 				"@type": "ImageObject",
 				"encodingFormat": "image/webp",
-				"url": "https://blog.matthewrease.net/static/icon.webp",
-				"width": "548",
-				"height": "548"
+				"url": "https://{{ metadata.config.blog_url }}/static/icon.webp",
+				"width": "{{ metadata.config.blog_icon.width }}",
+				"height": "{{ metadata.config.blog_icon.height }}"
 			}
 		},
-		"mainEntityOfPage": "https://blog.matthewrease.net/{{ metadata.canonical }}",
+		"mainEntityOfPage": "https://{{ metadata.config.blog_url }}/{{ metadata.canonical }}",
 		"keywords": "{{ ', '.join(metadata.tags) }}",
 		"image": {
 				"@type": "ImageObject",
@@ -87,7 +87,7 @@
 				<article>
 					<img id="postImage" src="{{ metadata.image.url }}" alt="{{ metadata.image.alt }}" style="width:100%" />
 					<div class="w3-container">
-						<h2><span><strong id="postTitle">{{ metadata.title }}</strong></span>{% if metadata.author != 'Matthew Rease' %}<span class="w3-medium">, by <a href="/author/NOTIMPLEMENTED">{{ metadata.author }}</a></span>{% endif %}</h2>
+						<h2><span><strong id="postTitle">{{ metadata.title }}</strong></span>{% if metadata.author != metadata.config.blog_author %}<span class="w3-medium">, by <a href="/author/NOTIMPLEMENTED">{{ metadata.author }}</a></span>{% endif %}</h2>
 						<!--<div class="w3-container">-->
 							<p id="postDescription">{{ metadata.description | safe }}</p>
 						<!--</div>-->
@@ -97,7 +97,7 @@
 						{{ metadata.preview | safe }}
 						<br />
 						{{ metadata.content | safe }}
-						{% if metadata.author != 'Matthew Rease' %}
+						{% if metadata.author != metadata.config.blog_author %}
 						<br />
 						<p>This post was contributed by another author, and its views may not entirely reflect those of mine. For more information click the authors name at the top of the page.</p>
 						{% endif %}

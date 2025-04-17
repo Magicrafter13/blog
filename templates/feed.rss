@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 	<channel>
-		<title>Compressed Thoughts</title>
-		<link>https://blog.matthewrease.net</link>
+		<title>{{ metadata.config.blog_title }}</title>
+		<link>https://{{ metadata.config.blog_url }}</link>
 		<description>
-			Personal blog of Matthew Rease. Elsewhere called "the thoughts of 1/7,762,000,000 of the world."
+			{% if metadata.config.rss_description %}{{ metadata.config.rss_description }}{% else %}{{ metadata.config.blog_description }}{% endif %}
 		</description>
 		<language>en-us</language>
-		<copyright>Copyright {{ metadata.now.year }}, Matthew Rease. Article contents are licensed under the Creative Commons Attribution NonCommercial ShareAlike 4.0 International.</copyright>
+		<copyright>Copyright {{ metadata.now.year }}, {{ metadata.config.blog_author }}. Article contents are licensed under {% if metadata.config.rss_license %}{{ metadata.config.rss_license }}{% else %}{{ metadata.config.post_license }}{% endif %}.</copyright>
 		<pubDate>{{ metadata.published }}</pubDate>
 		<lastBuildDate>{{ metadata.now }}</lastBuildDate>
 		<generator>Flask + Jinja</generator>
 		<docs>https://www.rssboard.org/rss-specification</docs>
-		<atom:link href="https://blog.matthewrease.net/rss" rel="self" type="application/rss+xml"/>
+		<atom:link href="https://{{ metadata.config.blog_url }}/rss" rel="self" type="application/rss+xml"/>
 		<image>
-			<url>https://blog.matthewrease.net/{{ metadata.image.url }}</url>
-			<title>Compressed Thoughts</title>
-			<link>https://blog.matthewrease.net</link>
+			<url>https://{{ metadata.config.blog_url }}/{{ metadata.image.url }}</url>
+			<title>{{ metadata.config.blog_title }}</title>
+			<link>https://{{ metadata.config.blog_url }}</link>
 		</image>
 		{% for post in metadata.posts %}
 		<item>
 			<title>{{ post.title }}</title>
-			<link>https://blog.matthewrease.net/post/{{ post.id }}</link>
+			<link>https://{{ metadata.config.blog_url }}/post/{{ post.id }}</link>
 			<description>{{ post.description | striptags }}</description>
 			<!--<author>email</author>-->
-			<enclosure url="https://blog.matthewrease.net/{{ post.image.url }}" length="{{ post.image.size }}" type="image/webp" />
+			<enclosure url="https://{{ metadata.config.blog_url }}/{{ post.image.url }}" length="{{ post.image.size }}" type="image/webp" />
 			<!--<guid>{{ post.id }}@{{ post.modified }}</guid>-->
-			<guid isPermaLink="true">https://blog.matthewrease.net/post/{{ post.id }}</guid>
+			<guid isPermaLink="true">https://{{ metadata.config.blog_url }}/post/{{ post.id }}</guid>
 			<pubDate>{{ post.published }}</pubDate>
 			<dcterms:modified>{{ post.modified }}</dcterms:modified>
-			<source url="https://blog.matthewrease.net/rss">Compressed Thoughts</source>
+			<source url="https://{{ metadata.config.blog_url }}/rss">{{ metadata.config.blog_title }}</source>
 			<!--<dc:creator>{{ post.author }}</dc:creator>
 			<media:keywords>{{ post.tags }}</media:keywords>-->
 		</item>

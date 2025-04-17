@@ -9,9 +9,10 @@ from os import environ
 import markdown
 import MySQLdb
 from dotenv import load_dotenv
-from flask import Flask, render_template, Response, send_file
+from flask import Flask, render_template, Response
 from PIL import Image
 
+import config
 from md_ext import HeadingShiftExtension, HeadingLinkExtension
 
 load_dotenv()
@@ -195,7 +196,7 @@ http404_post_metadata = {
     #},
     'title': 'Uh Oh!',
     'description': 'Did you mistype the link?',
-    'author': 'Matthew Rease',
+    'author': config.blog_author,
     'image': {
         'url': '/static/badID.webp',
         'width': 1280,
@@ -267,18 +268,27 @@ def index(tag_filter='', page=0):
             (f'%{tag_filter.lower()}%',))[0][0] - 1) // 5
         main_posts = [
             {
-                'id': row[6],
-                'image': f'/static/images/{row[6]}.webp',
-                'image_alt': row[7],
-                'title': row[1],
-                'description': row[2],
-                'preview': row[3],
-                'author': row[0],
-                'published': row[4].astimezone().replace(microsecond=0).isoformat(),
-                'modified': row[5].astimezone().replace(microsecond=0).isoformat(),
-                'datestr': row[4].strftime('%b %d, %Y')
+                'id': filename,
+                'image': f'/static/images/{filename}.webp',
+                'image_alt': image_alt,
+                'title': title,
+                'description': description,
+                'preview': preview,
+                'author': author,
+                'published': published.astimezone().replace(microsecond=0).isoformat(),
+                'modified': modified.astimezone().replace(microsecond=0).isoformat(),
+                'datestr': published.strftime('%b %d, %Y')
             }
-            for row in context.execute(
+            for (
+                author,
+                title,
+                description,
+                preview,
+                published,
+                modified,
+                filename,
+                image_alt
+            ) in context.execute(
                 f"""
                 SELECT User.name, Post.title, Post.description, Post.preview, Post.published, Post.modified, Post.filename, Post.image
                 FROM Post
@@ -295,6 +305,8 @@ def index(tag_filter='', page=0):
 
         # All relevant data for Jinja template.
         metadata = {
+            'config': config,
+            'now': datetime.now(),
             'csp': use_csp,
             'base': '',
             'canonical': '',
@@ -351,7 +363,9 @@ def show_post(post_id):
             (post_id,))
         if not res:  # Post does not exist
             return render_template('404_post.html', metadata=http404_post_metadata), 404
-        res = res[0]
+        # Unpack data
+        post_id, user_id, title, description, preview, content, published, modified, filename, image_alt = res[0]  # pylint: disable=line-too-long
+
         all_posts = context.get_all_posts_sidebar()
         # Alternate idea to get both tags_sql and the post in one query:
         #
@@ -370,23 +384,19 @@ def show_post(post_id):
         # |      19 | Confidentiality in the Digital Age | cryptography |
         # |      19 | Confidentiality in the Digital Age | privacy      |
         # +---------+------------------------------------+--------------+
-        tags_sql = context.execute(f"""
-            SELECT Tag.name
-            FROM PostTag
-            JOIN Tag ON PostTag.tag_id = Tag.tag_id
-            WHERE PostTag.post_id = {res[0]};""",  # Not explicitly optimized
-            tuple())                               # Should do the WHERE first...
-        author = context.get_user(res[1])
-        image = Image.open(f'static/images/{res[8]}.webp')
+        author = context.get_user(user_id)
+        image = Image.open(f'static/images/{filename}.webp')
         md_body = markdown.markdown(
-            res[5],
+            content,
             extensions=["fenced_code", HeadingShiftExtension(), HeadingLinkExtension()])
 
         # All relevant data for Jinja template.
         metadata = {
+            'config': config,
+            'now': datetime.now(),
             'csp': use_csp,
-            'base': f'post/{res[8]}',
-            'canonical': f'post/{res[8]}',
+            'base': f'post/{filename}',
+            'canonical': f'post/{filename}',
             'popular': [
                 {
                     'id': id,
@@ -396,7 +406,17 @@ def show_post(post_id):
                     'description': all_posts[id]['description']
                 }
                 for id in get_popular_posts()],
-            'tags': [row[0] for row in tags_sql],
+            'tags': [
+                row[0]
+                for row in context.execute(
+                    f"""
+                        SELECT Tag.name
+                        FROM PostTag
+                        JOIN Tag ON PostTag.tag_id = Tag.tag_id
+                        WHERE PostTag.post_id = {post_id};
+                    """,     # Not explicitly optimized
+                    tuple()) # Should do the WHERE first...
+            ],
             'filter': '',
             'archive': context.generate_archive_dict(),
             'month_names': {
@@ -413,18 +433,18 @@ def show_post(post_id):
                 '11': 'November',
                 '12': 'December'
             },
-            'title': res[2],
-            'description': res[3],
+            'title': title,
+            'description': description,
             'author': author,
             'image': {
-                'url': f'/static/images/{res[8]}.webp',
+                'url': f'/static/images/{filename}.webp',
                 'width': image.size[0],
                 'height': image.size[1],
-                'alt': res[9]
+                'alt': image_alt
             },
-            'preview': res[4],
-            'published': res[6].astimezone().replace(microsecond=0).isoformat(),
-            'modified': res[7].astimezone().replace(microsecond=0).isoformat(),
+            'preview': preview,
+            'published': published.astimezone().replace(microsecond=0).isoformat(),
+            'modified': modified.astimezone().replace(microsecond=0).isoformat(),
             'content': md_body
         }
         return render_template('post.html', metadata=metadata)
@@ -460,6 +480,8 @@ def rss():
         reverse=True)
 
     metadata = {
+        'config': config,
+        'now': datetime.now(),
         'now': datetime.now().astimezone().strftime('%a, %d %h %Y %H:%M:%S %z'),
         'published': posts[0]['raw_published'].astimezone().strftime('%a, %d %h %Y %H:%M:%S %z'),
         'image': {

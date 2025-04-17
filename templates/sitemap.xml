@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
-		<loc>https://blog.matthewrease.net</loc>
+		<loc>https://{{ metadata.config.blog_url }}</loc>
 		<lastmod>{{ posts[0].modified }}</lastmod>
 		<changefreq>daily</changefreq>
 		<priority>1.00</priority>
 	</url>
 	{% for post in posts %}
 	<url>
-		<loc>https://blog.matthewrease.net/post/{{ post.id }}</loc>
+		<loc>https://{{ metadata.config.blog_url }}/post/{{ post.id }}</loc>
 		<lastmod>{{ post.modified }}</lastmod>
 		<changefreq>monthly</changefreq>
 		<priority>0.90</priority>
