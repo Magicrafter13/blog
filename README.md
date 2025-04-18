@@ -11,6 +11,9 @@ See the sister project `blog-posts` under this same user account (not linked
 for... reasons).
 
 # Running This App
+For the best experience please pass `--ini default.ini` to `uwsgi`. You may
+overwrite values at your discretion, but the logging it setup in a specific way,
+so that the Python app can determine which posts are accessed the most.
 ## Needed Libraries
 Package names according to PyPI:
 - Markdown

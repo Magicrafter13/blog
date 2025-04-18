@@ -1,7 +1,7 @@
 .env
 /static/images/
 /__pycache__/
-/uwsgi.log
+/access.log
 /static/nerdfont.css
 /static/nerdfont.woff2
 /static/lazysizes.min.js

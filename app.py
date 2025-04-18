@@ -235,15 +235,15 @@ def get_popular_posts() -> list[str]:
     if now - popular_posts['last_check'] > TWO_HOUR_DELTA:
         popular_posts['last_check'] = now
         try:
-            with open('uwsgi.log', 'r', encoding='utf-8') as log:
+            with open('access.log', 'r', encoding='utf-8') as log:
                 new_data = Counter()
                 for line in log.read().splitlines():
-                    if '] GET /post/' in line:
-                        new_data[line.split('] GET /post/')[1].split()[0]] += 1
+                    if 'GET 200 /post/' in line:
+                        new_data[line.split()[3][6:]] += 1
                 popular_posts['data'] = [key for key, _ in new_data.most_common(3)]
         except FileNotFoundError as _e:
             print(_e)
-            redlog("Please create a log file, even if you won't use it, to minimize work on the server!")  # pylint: disable=line-too-long
+            redlog("Please create a log file with the designated log format, even if you won't use it, to minimize work on the server!")  # pylint: disable=line-too-long
         #print(new_data)
     #print(popular_posts)
     return popular_posts['data'] or [] # [ '202002101957', '202002261145', '202004161413' ]
