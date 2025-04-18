@@ -505,4 +505,4 @@ def sitemap():
         key=lambda x: x['id'],
         reverse=True)
 
-    return Response(render_template('sitemap.xml', posts=posts), mimetype='application/xml')
+    return Response(render_template('sitemap.xml', posts=posts, metadata={ 'config': config }), mimetype='application/xml')
