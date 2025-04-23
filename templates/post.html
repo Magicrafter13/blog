@@ -63,8 +63,8 @@
 		"image": {
 				"@type": "ImageObject",
 				"url": "{{ metadata.image.url }}",
-				"width": {{ metadata.image.url.width }},
-				"height": {{ metadata.image.url.height }}
+				"width": {{ metadata.image.width }},
+				"height": {{ metadata.image.height }}
 		},
 		"headline": "{{ metadata.title | replace('"', '\\"') | safe }}",
 		"author": {
