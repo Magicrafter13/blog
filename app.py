@@ -160,14 +160,18 @@ def redlog(msg):
 
 use_csp = environ.get('USE_CSP').lower() == 'true'
 http500_db_metadata = {
+    'config': config,
+    'now': datetime.now(),
     'csp': use_csp,
     'base': '',
     'canonical': ''
 }
 http404_post_metadata = {
+    'config': config,
+    'now': datetime.now(),
     'csp' : use_csp,
     'base': '',
-    'canonical': 'post/',
+    'canonical': '/post/',
     #'popular': [
     #    {
     #        'id': id,
@@ -309,7 +313,11 @@ def index(tag_filter='', page=0):
             'now': datetime.now(),
             'csp': use_csp,
             'base': '',
-            'canonical': '',
+            'canonical': (
+                f"{'/' if tag_filter == '' and page == 0 else ''}"
+                f"{'' if tag_filter == '' else f'/filter/{tag_filter}'}"
+                f"{'' if page == 0 else f'/page/{page}'}"
+            ),
             'popular': [
                 {
                     'id': id,
@@ -396,7 +404,7 @@ def show_post(post_id):
             'now': datetime.now(),
             'csp': use_csp,
             'base': f'post/{filename}',
-            'canonical': f'post/{filename}',
+            'canonical': f'/post/{filename}',
             'popular': [
                 {
                     'id': id,
